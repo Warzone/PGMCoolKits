@@ -59,5 +59,9 @@ public interface NMSHacks {
 
   int allocateEntityId();
 
-  boolean collidesWithBlock(Location center, double halfSize, Vector delta);
+  boolean isDisplayEntity(Entity entity);
+
+  boolean isDisplayEntity(Class<? extends Entity> entity);
+
+  void setBlockDisplayBlock(Entity entity, Material block);
 }

@@ -128,12 +128,9 @@ public class ProjectileMatchModule implements MatchModule, Listener {
           var be = BlockEntity.spawnBlockEntity(loc, definition.blockMaterial, ce.size(), velocity);
           new BlockRunner(definition, be, player, loc);
         }
-      }
-
-      if (definition.power != null && projectile instanceof Explosive) {
-        ((Explosive) projectile).setYield(definition.power);
-      }
-      if (projectile != null) {
+        if (NMSHacks.NMS_HACKS.isDisplayEntity(projectile)) {
+          NMSHacks.NMS_HACKS.setBlockDisplayBlock(projectile, projectileDefinition.blockMaterial.getItemType());
+        }
         projectile.setMetadata(
             "projectileDefinition", new FixedMetadataValue(PGM.get(), definition));
       }

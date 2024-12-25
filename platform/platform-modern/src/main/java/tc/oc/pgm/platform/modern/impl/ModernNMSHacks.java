@@ -40,7 +40,7 @@ import net.minecraft.world.entity.projectile.FireworkRocketEntity;
 import net.minecraft.world.level.LevelSettings;
 import net.minecraft.world.level.WorldDataConfiguration;
 import net.minecraft.world.level.biome.BiomeManager;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.dimension.LevelStem;
@@ -69,10 +69,7 @@ import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.entity.CraftFirework;
 import org.bukkit.craftbukkit.generator.CraftWorldInfo;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Fireball;
-import org.bukkit.entity.Firework;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.world.WorldLoadEvent;
@@ -463,46 +460,18 @@ public class ModernNMSHacks implements NMSHacks {
   }
 
   @Override
-  public boolean collidesWithBlock(Location center, double halfSize, Vector delta) {
-    World world = center.getWorld();
+  public boolean isDisplayEntity(Entity entity) {
+      return entity instanceof Display;
 
-    BoundingBox probeAABB = new BoundingBox(
-      center.getX() - halfSize + Math.min(0, delta.getX()),
-      center.getY() - halfSize + Math.min(0, delta.getY()),
-      center.getZ() - halfSize + Math.min(0, delta.getZ()),
+  }
 
-      center.getX() + halfSize + Math.max(0, delta.getX()),
-      center.getY() + halfSize + Math.max(0, delta.getY()),
-      center.getZ() + halfSize + Math.max(0, delta.getZ())
-    );
+  @Override
+  public boolean isDisplayEntity(Class<? extends Entity> entity) {
+      return entity.isAssignableFrom(BlockDisplay.class) || entity.isAssignableFrom(TextDisplay.class) || entity.isAssignableFrom(ItemDisplay.class);
+  }
 
-    int minX = Mth.floor(probeAABB.getMinX());
-    int maxX = Mth.floor(probeAABB.getMaxX() - 1.0E-7);
-
-    int minY = Mth.floor(probeAABB.getMinY());
-    int maxY = Mth.floor(probeAABB.getMaxY() - 1.0E-7);
-
-    int minZ = Mth.floor(probeAABB.getMinZ());
-    int maxZ = Mth.floor(probeAABB.getMaxZ() - 1.0E-7);
-
-    for (int x = minX; x <= maxX; x++) {
-      for (int y = minY; y <= maxY; y++) {
-        for (int z = minZ; z <= maxZ; z++) {
-          Block block = world.getBlockAt(x, y, z);
-          
-          VoxelShape shape = block.getCollisionShape();
-          Collection<BoundingBox> boxes =  shape.getBoundingBoxes();
-          if (boxes.isEmpty()) continue;
-          
-          for (BoundingBox box : boxes) {
-            if (probeAABB.overlaps(box.clone().shift(block.getX(), block.getY(), block.getZ()))) {
-              return true;
-            }
-          }
-        }
-      }
-    }
-
-    return false;
+  @Override
+  public void setBlockDisplayBlock(Entity entity, Material block) {
+    ((BlockDisplay) entity).setBlock(block.createBlockData());
   }
 }

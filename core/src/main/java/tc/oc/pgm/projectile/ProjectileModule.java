@@ -23,6 +23,7 @@ import tc.oc.pgm.filters.FilterModule;
 import tc.oc.pgm.filters.parse.FilterParser;
 import tc.oc.pgm.kits.KitParser;
 import tc.oc.pgm.util.material.BlockMaterialData;
+import tc.oc.pgm.util.nms.NMSHacks;
 import tc.oc.pgm.util.xml.InvalidXMLException;
 import tc.oc.pgm.util.xml.Node;
 import tc.oc.pgm.util.xml.XMLFluentParser;
@@ -63,10 +64,12 @@ public class ProjectileModule implements MapModule<ProjectileMatchModule> {
             Node.fromChildOrAttr(projectileElement, "velocity"), Double.class, 1.0);
         ClickAction clickAction = XMLUtils.parseEnum(
             Node.fromAttr(projectileElement, "click"), ClickAction.class, ClickAction.BOTH);
-        ProjectileDefinition.ProjectileEntity entity =
-            parseProjectileEntity(projectileElement, factory.getParser());
-        BlockMaterialData blockMaterial = entity.requiresBlockMaterial()
-            ? XMLUtils.parseBlockMaterialData(Node.fromRequiredAttr(projectileElement, "material"))
+        Class<? extends Entity> entity =
+            XMLUtils.parseEntityTypeAttribute(projectileElement, "projectile", Arrow.class);
+        System.out.println("WHAT TYPE IS THE DISPLAY ENTITY????? ==================");
+        System.out.println(entity.getSimpleName());
+        BlockMaterialData blockMaterial = entity.isAssignableFrom(FallingBlock.class) || NMSHacks.NMS_HACKS.isDisplayEntity(entity)
+            ? XMLUtils.parseBlockMaterialData(Node.fromAttr(projectileElement, "material"))
             : null;
         Float power = XMLUtils.parseNumber(
             Node.fromChildOrAttr(projectileElement, "power"), Float.class, (Float) null);

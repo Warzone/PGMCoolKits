@@ -229,26 +229,17 @@ public class SpNMSHacks implements NMSHacks {
   }
 
   @Override
-  public boolean collidesWithBlock(Location center, double halfSize, Vector delta) {
-    System.out.println("WRONG ONE");
-    AxisAlignedBB box = new AxisAlignedBB(
-        center.getX() - halfSize,
-        center.getY() - halfSize,
-        center.getZ() - halfSize,
-        center.getX() + halfSize,
-        center.getY() + halfSize,
-        center.getZ() + halfSize
-    );
+  public boolean isDisplayEntity(Entity entity) {
+    return false;
+  }
 
-    AxisAlignedBB swept = box.a(
-        delta.getX(),
-        delta.getY(),
-        delta.getZ()
-    );
+  @Override
+  public boolean isDisplayEntity(Class<? extends Entity> entity) {
+    return false;
+  }
 
-    CraftWorld craftWorld = (CraftWorld) center.getWorld();
-    WorldServer world = craftWorld.getHandle();
-
-    return world.a(swept, (net.minecraft.server.v1_8_R3.Entity) null);
+  @Override
+  public void setBlockDisplayBlock(Entity entity, Material block) {
+    throw new UnsupportedOperationException("Display entities are not supported on lower versions.");
   }
 }
