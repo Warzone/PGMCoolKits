@@ -6,8 +6,9 @@ import com.google.common.collect.ImmutableSet;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -35,6 +36,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import tc.oc.pgm.api.PGM;
 import tc.oc.pgm.api.event.BlockTransformEvent;
@@ -130,6 +132,12 @@ public class ProjectileMatchModule implements MatchModule, Listener {
         }
         if (NMSHacks.NMS_HACKS.isDisplayEntity(projectile)) {
           NMSHacks.NMS_HACKS.setBlockDisplayBlock(projectile, projectileDefinition.blockMaterial.getItemType());
+          final Vector normalizedDirection = player.getLocation().getDirection().normalize();
+          runFixedTimesAtPeriod(
+              match.getExecutor(MatchScope.RUNNING),
+              () -> this.moveEntity(projectile, normalizedDirection, 0.2D),
+              1L, 80, () -> { projectile.remove(); }
+          );
         }
         projectile.setMetadata(
             "projectileDefinition", new FixedMetadataValue(PGM.get(), definition));
@@ -157,6 +165,39 @@ public class ProjectileMatchModule implements MatchModule, Listener {
     if (definition.coolDown != null) {
       startCooldown(player, definition);
     }
+  }
+
+  // For entities which need their velocity simulated
+  private boolean moveEntity(final Entity entity, final Vector direction, final double magnitude) {
+    final Vector delta = direction.clone().multiply(magnitude);
+    final Location to = entity.getLocation().clone().add(delta);
+    entity.teleport(to);
+    return false;
+  }
+
+  private static void runFixedTimesAtPeriod(
+        final ScheduledExecutorService scheduledExecutorService, final BooleanSupplier runnable,
+        final long periodTicks, final int iterations,
+        final Runnable finishHandler
+  ) {
+    final ScheduledFuture<?>[] ref = new ScheduledFuture[2];
+    final ScheduledFuture<?> mainTask = scheduledExecutorService.scheduleAtFixedRate(
+        () -> {
+          final boolean shouldCancel = runnable.getAsBoolean();
+          if (shouldCancel) {
+            ref[0].cancel(true);
+            ref[1].cancel(true);
+            finishHandler.run();
+          }
+        }, 0L, periodTicks * 50L, TimeUnit.MILLISECONDS
+    );
+    final ScheduledFuture<?> cleanupTask = scheduledExecutorService.schedule(() -> {
+      if (ref[0].isCancelled()) return;
+      ref[0].cancel(true);
+      finishHandler.run();
+    }, periodTicks * 50L * iterations, TimeUnit.MILLISECONDS);
+    ref[0] = mainTask;
+    ref[1] = cleanupTask;
   }
 
   @EventHandler
