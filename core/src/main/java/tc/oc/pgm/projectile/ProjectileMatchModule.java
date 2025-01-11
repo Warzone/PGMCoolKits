@@ -132,9 +132,11 @@ public class ProjectileMatchModule implements MatchModule, Listener {
         }
         if (NMSHacks.NMS_HACKS.isDisplayEntity(projectile)) {
           NMSHacks.NMS_HACKS.setBlockDisplayBlock(projectile, projectileDefinition.blockMaterial.getItemType());
+//          NMSHacks.NMS_HACKS.setInterpolationDelayDisplayEntity(projectile, 0);
+//          NMSHacks.NMS_HACKS.setInterpolationDurationDisplayEntity(projectile, 1);
           final Vector normalizedDirection = player.getLocation().getDirection().normalize();
           final SinusoidalProjectilePath sinusoidalProjectilePath = new SinusoidalProjectilePath(
-            normalizedDirection, 4, 1
+            normalizedDirection, 0.1, 0.5
           );
           runFixedTimesAtPeriod(
               match.getExecutor(MatchScope.RUNNING),
@@ -147,7 +149,7 @@ public class ProjectileMatchModule implements MatchModule, Listener {
                   return false;
                 }
               },
-              1L, 80, () -> { projectile.remove(); }
+              1L, 4000, () -> { projectile.remove(); }
           );
         }
         projectile.setMetadata(
@@ -188,7 +190,7 @@ public class ProjectileMatchModule implements MatchModule, Listener {
 
   private static void runFixedTimesAtPeriod(
         final ScheduledExecutorService scheduledExecutorService, final BooleanSupplier runnable,
-        final long periodTicks, final int iterations,
+        final long periodTicks, final int upperBoundMillis,
         final Runnable finishHandler
   ) {
     // effectively final capture
@@ -208,7 +210,7 @@ public class ProjectileMatchModule implements MatchModule, Listener {
       if (ref[0].isCancelled()) return;
       ref[0].cancel(true);
       finishHandler.run();
-    }, periodTicks * 50L * iterations, TimeUnit.MILLISECONDS);
+    }, upperBoundMillis, TimeUnit.MILLISECONDS);
     ref[0] = mainTask;
     ref[1] = cleanupTask;
   }
