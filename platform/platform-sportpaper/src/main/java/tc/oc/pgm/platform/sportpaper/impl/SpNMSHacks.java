@@ -252,4 +252,9 @@ public class SpNMSHacks implements NMSHacks {
   public void setBlockDisplayBlock(Entity entity, Material block) {
     throw new UnsupportedOperationException("Display entities are not supported on lower versions.");
   }
+
+  @Override
+  public void setDisplayEntityRotation(Entity entity, double pitch, double yaw) {
+    throw new UnsupportedOperationException("Display entities are not supported on lower versions.");
+  }
 }

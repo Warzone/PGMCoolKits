@@ -38,6 +38,7 @@ import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.xml.sax.Locator;
 import tc.oc.pgm.api.PGM;
 import tc.oc.pgm.api.event.BlockTransformEvent;
 import tc.oc.pgm.api.filter.Filter;
@@ -117,12 +118,13 @@ public class ProjectileMatchModule implements MatchModule, Listener {
               NMSHacks.NMS_HACKS.setFireballDirection(fireball, velocity);
             }
           } else {
-            if (FallingBlock.class.isAssignableFrom(entityType)) {
-              projectile = definition.blockMaterial.spawnFallingBlock(player.getEyeLocation());
-            } else {
-              projectile = player.getWorld().spawn(player.getEyeLocation(), entityType);
+            Location loc = player.getEyeLocation();
+            if (NMSHacks.NMS_HACKS.isDisplayEntity(projectileDefinition.projectile)) {
+              loc.setPitch(0);
+              loc.setYaw(0);
             }
-            projectile.setVelocity(velocity);
+            projectile =
+                player.getWorld().spawn(loc, projectileDefinition.projectile);
           }
         }
         case ProjectileDefinition.BlockEntityType ce -> {
@@ -131,8 +133,14 @@ public class ProjectileMatchModule implements MatchModule, Listener {
           new BlockRunner(definition, be, player, loc);
         }
         if (NMSHacks.NMS_HACKS.isDisplayEntity(projectile)) {
+          Location loc = player.getEyeLocation();
+//          projectile.teleport(new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ(), player.getEyeLocation().getYaw(), player.getEyeLocation().getPitch()));
+//          projectile.teleport(new Location(loc.getWorld(), loc.getX() - 0.5, loc.getY(), loc.getZ() - 0.5, projectile.getLocation().getYaw(), projectile.getLocation().getPitch()));
+//          NMSHacks.NMS_HACKS.setDisplayEntityRotation(projectile, player.getEyeLocation().getPitch(), player.getLocation().getYaw());
           NMSHacks.NMS_HACKS.setBlockDisplayBlock(projectile, projectileDefinition.blockMaterial.getItemType());
 
+
+          Vector center = projectile.getLocation().toVector().add(new Vector(-0.5, 0.5, -0.5));
           final Vector normalizedDirection = player.getLocation().getDirection().normalize();
           final SinusoidalProjectilePath sinusoidalProjectilePath = new SinusoidalProjectilePath(
             normalizedDirection, 0.1, 0.5
@@ -144,9 +152,9 @@ public class ProjectileMatchModule implements MatchModule, Listener {
 
                 @Override
                 public boolean getAsBoolean() {
-                  projectile.teleport(calculateTo(projectile, sinusoidalProjectilePath, ++progress));
-                  NMSHacks.NMS_HACKS.setInterpolationDelayDisplayEntity(projectile, 0);
-                  NMSHacks.NMS_HACKS.setInterpolationDurationDisplayEntity(projectile, 1);
+//                  NMSHacks.NMS_HACKS.setInterpolationDelayDisplayEntity(projectile, 0);
+//                  NMSHacks.NMS_HACKS.setInterpolationDurationDisplayEntity(projectile, 1);
+//                  projectile.teleport(calculateTo(projectile, sinusoidalProjectilePath, ++progress));
                   return false;
                 }
               },
