@@ -134,7 +134,8 @@ public class ProjectileMatchModule implements MatchModule, Listener {
           NMSHacks.NMS_HACKS.alignBlockDisplayToPlayerFacing(
               projectile,
               loc.getPitch(),
-              loc.getYaw()
+              loc.getYaw(),
+              projectileDefinition.scale
           );
 
           NMSHacks.NMS_HACKS.setBlockDisplayBlock(projectile, projectileDefinition.blockMaterial.getItemType());
@@ -155,7 +156,9 @@ public class ProjectileMatchModule implements MatchModule, Listener {
                 public boolean getAsBoolean() {
                   NMSHacks.NMS_HACKS.setTeleportationDuration(projectile, 1);
                   projectile.teleport(calculateTo(projectile, linearProjectilePath, ++progress));
-                  List<Entity> nearbyEntities = projectile.getNearbyEntities(0.5, 0.5, 0.5);
+                  long startTime = System.currentTimeMillis();
+                  List<Entity> nearbyEntities = projectile.getNearbyEntities(0.5 * projectileDefinition.scale, 0.5 * projectileDefinition.scale, 0.5 * projectileDefinition.scale);
+
                   if (!nearbyEntities.isEmpty()) {
                     for (Entity entity : nearbyEntities) {
                       if (entity instanceof Player) {
@@ -167,6 +170,8 @@ public class ProjectileMatchModule implements MatchModule, Listener {
                       }
                     }
                   }
+                  long endTime = System.currentTimeMillis();
+                  System.out.println("total time:" + (endTime - startTime));
                   return false;
                 }
               },

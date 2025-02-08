@@ -72,5 +72,5 @@ public interface NMSHacks {
 
   void setBlockDisplayBlock(Entity entity, Material block);
 
-  void alignBlockDisplayToPlayerFacing(Entity entity, float pitch, float yaw);
+  void alignBlockDisplayToPlayerFacing(Entity entity, float pitch, float yaw, float scale);
 }
