@@ -116,7 +116,7 @@ public class ProjectileMatchModule implements MatchModule, Listener {
             }
           } else {
             Location loc = player.getEyeLocation();
-            if (NMSHacks.NMS_HACKS.isDisplayEntity(projectileDefinition.projectile)) {
+            if (NMSHacks.NMS_HACKS.isBlockDisplayEntity(projectileDefinition.projectile)) {
               loc.setPitch(0);
               loc.setYaw(0);
             }
@@ -129,7 +129,7 @@ public class ProjectileMatchModule implements MatchModule, Listener {
           var be = BlockEntity.spawnBlockEntity(loc, definition.blockMaterial, ce.size(), velocity);
           new BlockRunner(definition, be, player, loc);
         }
-        if (NMSHacks.NMS_HACKS.isDisplayEntity(projectile)) {
+        if (NMSHacks.NMS_HACKS.isBlockDisplayEntity(projectile)) {
           Location loc = player.getEyeLocation();
           NMSHacks.NMS_HACKS.alignBlockDisplayToPlayerFacing(
               projectile,
@@ -141,9 +141,6 @@ public class ProjectileMatchModule implements MatchModule, Listener {
           NMSHacks.NMS_HACKS.setBlockDisplayBlock(projectile, projectileDefinition.blockMaterial.getItemType());
 
           final Vector normalizedDirection = player.getLocation().getDirection().normalize();
-//          final SinusoidalProjectilePath sinusoidalProjectilePath = new SinusoidalProjectilePath(
-//            normalizedDirection, 0.1, 0.5
-//          );
           final LinearProjectilePath linearProjectilePath = new LinearProjectilePath(
             normalizedDirection, projectileDefinition.velocity
           );
@@ -156,24 +153,21 @@ public class ProjectileMatchModule implements MatchModule, Listener {
                 public boolean getAsBoolean() {
                   NMSHacks.NMS_HACKS.setTeleportationDuration(projectile, 1);
                   projectile.teleport(calculateTo(projectile, linearProjectilePath, ++progress));
-//                  long startTime = System.currentTimeMillis();
-                  List<Entity> nearbyEntities = projectile.getNearbyEntities(0.5 * projectileDefinition.scale, 0.5 * projectileDefinition.scale, 0.5 * projectileDefinition.scale);
 
                   if (projectileDefinition.damage != null) {
+                    List<Entity> nearbyEntities = projectile.getNearbyEntities(0.5 * projectileDefinition.scale, 0.5 * projectileDefinition.scale, 0.5 * projectileDefinition.scale);
                     if (!nearbyEntities.isEmpty()) {
+                      Party playerParty = PGM.get().getMatchManager().getPlayer(player).getParty();
                       for (Entity entity : nearbyEntities) {
                         if (entity instanceof Player) {
-                          if (PGM.get().getMatchManager().getPlayer(player).getParty() != PGM.get().getMatchManager().getPlayer(((Player) entity)).getParty()) {
-                            double newHealth = (((Player) entity).getHealth() - projectileDefinition.damage) < 0 ? 0 : ((Player) entity).getHealth() - 4;
-                            ((Player) entity).setHealth(newHealth);
+                          if (playerParty != PGM.get().getMatchManager().getPlayer(((Player) entity)).getParty()) {
+                            ((Player) entity).damage(projectileDefinition.damage, player);
                             return true;
                           }
                         }
                       }
                     }
                   }
-//                  long endTime = System.currentTimeMillis();
-//                  System.out.println("total time:" + (endTime - startTime));
                   return false;
                 }
               },
