@@ -24,6 +24,7 @@ public class ProjectileDefinition extends SelfIdentifyingFeatureDefinition {
   protected boolean precise;
   protected BlockMaterialData blockMaterial;
   protected float scale;
+  protected boolean solidBlockCollision;
 
   public ProjectileDefinition(
       @Nullable String id,
@@ -39,7 +40,8 @@ public class ProjectileDefinition extends SelfIdentifyingFeatureDefinition {
       boolean throwable,
       boolean precise,
       BlockMaterialData blockMaterial,
-      float scale) {
+      float scale,
+      boolean solidBlockCollision) {
     super(id);
     this.name = name;
     this.damage = damage;
@@ -54,6 +56,7 @@ public class ProjectileDefinition extends SelfIdentifyingFeatureDefinition {
     this.precise = precise;
     this.blockMaterial = blockMaterial;
     this.scale = scale;
+    this.solidBlockCollision = solidBlockCollision;
   }
 
   public sealed interface ProjectileEntity permits RealEntity, BlockEntityType {
