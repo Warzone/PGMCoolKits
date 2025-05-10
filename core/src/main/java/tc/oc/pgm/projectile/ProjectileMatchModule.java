@@ -131,7 +131,7 @@ public class ProjectileMatchModule implements MatchModule, Listener {
           var be = BlockEntity.spawnBlockEntity(loc, definition.blockMaterial, ce.size(), velocity);
           new BlockRunner(definition, be, player, loc);
         }
-        if (NMSHacks.NMS_HACKS.isBlockDisplayEntity(projectile)) {
+        if (NMSHacks.NMS_HACKS.isBlockDisplayEntity(projectileDefinition.projectile)) {
           Location loc = player.getEyeLocation();
           NMSHacks.NMS_HACKS.alignBlockDisplayToPlayerFacing(
               projectile,
