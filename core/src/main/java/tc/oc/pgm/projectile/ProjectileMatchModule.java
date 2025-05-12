@@ -1,6 +1,7 @@
 package tc.oc.pgm.projectile;
 
 import static tc.oc.pgm.util.Assert.assertTrue;
+import static tc.oc.pgm.util.nms.Packets.ENTITIES;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -59,6 +60,8 @@ import tc.oc.pgm.util.bukkit.MetadataUtils;
 import tc.oc.pgm.util.bukkit.entities.BlockEntity;
 import tc.oc.pgm.util.inventory.InventoryUtils;
 import tc.oc.pgm.util.nms.NMSHacks;
+import tc.oc.pgm.util.nms.packets.EntityPackets;
+import tc.oc.pgm.util.nms.packets.FakeEntity;
 
 @ListenerScope(MatchScope.RUNNING)
 public class ProjectileMatchModule implements MatchModule, Listener {
@@ -118,6 +121,10 @@ public class ProjectileMatchModule implements MatchModule, Listener {
             }
           } else {
             Location loc = player.getEyeLocation();
+            ENTITIES.
+            // if (fakeBlockEntity.needsYadayadayada()) {
+            //
+            //}
             if (NMSHacks.NMS_HACKS.isBlockDisplayEntity(projectileDefinition.projectile)) {
               loc.setPitch(0);
               loc.setYaw(0);
@@ -147,6 +154,14 @@ public class ProjectileMatchModule implements MatchModule, Listener {
             normalizedDirection, projectileDefinition.velocity
           );
           final Location initialLocation = projectile.getLocation();
+
+          // BlockEntity entity = EntityPackets.fakeBlockEntity();
+          // spawn it here thru the wrapper
+          // shootProjectile(entity, projDef, etc.......);
+          // runFixedTimesAtPeriod(
+          //
+          // )
+          //
           runFixedTimesAtPeriod(
               match.getExecutor(MatchScope.RUNNING),
               new BooleanSupplier() {
@@ -203,6 +218,42 @@ public class ProjectileMatchModule implements MatchModule, Listener {
     if (definition.coolDown != null) {
       startCooldown(player, definition);
     }
+  }
+
+  private void shootProjectile(
+      Entity projectile, FakeEntity fakeEntity, ProjectileDefinition projectileDefinition,
+      Location initialLocation, ProjectilePath projectilePath, Player player, Vector normalizedDirection
+  ) {
+    runFixedTimesAtPeriod(
+          match.getExecutor(MatchScope.RUNNING),
+          new BooleanSupplier() {
+            private int progress = 0;
+            private Location currentLocation = initialLocation.clone();
+
+
+            @Override
+            public boolean getAsBoolean() {
+              NMSHacks.NMS_HACKS.setTeleportationDuration(projectile, 1);
+
+              Location incrementingLocation = currentLocation.clone();
+              Location newLocation = calculateTo(initialLocation, projectilePath, ++progress);
+
+              fakeEntity.teleport(newLocation);
+              if (projectileDefinition.damage != null || projectileDefinition.solidBlockCollision) {
+                while (currentLocation.distanceSquared(incrementingLocation) < currentLocation.distanceSquared(newLocation)) {
+                  if (blockDisplayCollision(projectileDefinition, player, incrementingLocation)) {
+                    return true;
+                  }
+                  incrementingLocation.add(normalizedDirection.clone().multiply(projectileDefinition.scale));
+                }
+                currentLocation = newLocation.clone();
+                return blockDisplayCollision(projectileDefinition, player, incrementingLocation);
+              }
+              return false;
+            }
+          },
+          1L, projectileDefinition.maxTravelTime.toMillis(), projectile::remove
+    );
   }
 
   private boolean blockDisplayCollision(ProjectileDefinition projectileDefinition, Player player, Location location) {
