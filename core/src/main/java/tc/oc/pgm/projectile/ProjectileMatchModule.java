@@ -151,14 +151,7 @@ public class ProjectileMatchModule implements MatchModule, Listener {
           Location loc = player.getEyeLocation();
 
           blockEntity.align(loc.getPitch(), loc.getYaw(), projectileDefinition.scale);
-//          NMSHacks.NMS_HACKS.alignBlockDisplayToPlayerFacing(
-//              projectile,
-//              loc.getPitch(),
-//              loc.getYaw(),
-//              projectileDefinition.scale
-//          );
 
-//          NMSHacks.NMS_HACKS.setBlockDisplayBlock(projectile, projectileDefinition.blockMaterial.getItemType());
           blockEntity.setBlock(projectileDefinition.blockMaterial.getItemType());
 
           final Vector normalizedDirection = player.getLocation().getDirection().normalize();
@@ -167,13 +160,6 @@ public class ProjectileMatchModule implements MatchModule, Listener {
           );
           final Location initialLocation = projectile.getLocation();
 
-          // BlockEntity entity = EntityPackets.fakeBlockEntity();
-          // spawn it here thru the wrapper
-          // shootProjectile(entity, projDef, etc.......);
-          // runFixedTimesAtPeriod(
-          //
-          // )
-          //
           BlockEntity finalBlockEntity = blockEntity;
           Entity finalProjectile = projectile;
           runFixedTimesAtPeriod(
@@ -184,7 +170,6 @@ public class ProjectileMatchModule implements MatchModule, Listener {
 
                 @Override
                 public boolean getAsBoolean() {
-//                  NMSHacks.NMS_HACKS.setTeleportationDuration(projectile, 1);
                   finalBlockEntity.setTeleportationDuration(1);
 
                   Location currentLocation = finalProjectile.getLocation();
@@ -233,42 +218,6 @@ public class ProjectileMatchModule implements MatchModule, Listener {
     if (definition.coolDown != null) {
       startCooldown(player, definition);
     }
-  }
-
-  private void shootProjectile(
-      Entity projectile, FakeEntity fakeEntity, ProjectileDefinition projectileDefinition,
-      Location initialLocation, ProjectilePath projectilePath, Player player, Vector normalizedDirection
-  ) {
-    runFixedTimesAtPeriod(
-          match.getExecutor(MatchScope.RUNNING),
-          new BooleanSupplier() {
-            private int progress = 0;
-            private Location currentLocation = initialLocation.clone();
-
-
-            @Override
-            public boolean getAsBoolean() {
-              NMSHacks.NMS_HACKS.setTeleportationDuration(projectile, 1);
-
-              Location incrementingLocation = currentLocation.clone();
-              Location newLocation = calculateTo(initialLocation, projectilePath, ++progress);
-
-              fakeEntity.teleport(newLocation);
-              if (projectileDefinition.damage != null || projectileDefinition.solidBlockCollision) {
-                while (currentLocation.distanceSquared(incrementingLocation) < currentLocation.distanceSquared(newLocation)) {
-                  if (blockDisplayCollision(projectileDefinition, player, incrementingLocation)) {
-                    return true;
-                  }
-                  incrementingLocation.add(normalizedDirection.clone().multiply(projectileDefinition.scale));
-                }
-                currentLocation = newLocation.clone();
-                return blockDisplayCollision(projectileDefinition, player, incrementingLocation);
-              }
-              return false;
-            }
-          },
-          1L, projectileDefinition.maxTravelTime.toMillis(), projectile::remove
-    );
   }
 
   private boolean blockDisplayCollision(ProjectileDefinition projectileDefinition, Player player, Location location) {
