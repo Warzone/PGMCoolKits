@@ -62,22 +62,25 @@ public class ProjectileDefinition extends SelfIdentifyingFeatureDefinition {
     this.maxTravelTime = maxTravelTime;
   }
 
-  public sealed interface ProjectileEntity permits RealEntity, BlockEntityType {
-    boolean requiresBlockMaterial();
-  }
+  public static sealed class ProjectileEntity {
+    public static final class RealEntity extends ProjectileEntity {
+      public final Class<? extends Entity> entityType;
 
-  record RealEntity(Class<? extends Entity> entityType) implements ProjectileEntity {
-    @Override
-    public boolean requiresBlockMaterial() {
-      return FallingBlock.class.isAssignableFrom(entityType);
+      public RealEntity(Class<? extends Entity> entityType) {
+        this.entityType = entityType;
+      }
     }
-  }
 
-  record BlockEntityType(float size, boolean solidBlockCollision, Duration maxTravelTime)
-      implements ProjectileEntity {
-    @Override
-    public boolean requiresBlockMaterial() {
-      return true;
+    public static final class AbstractEntity extends ProjectileEntity {
+      public final AbstractEntityType entityType;
+
+      public AbstractEntity(AbstractEntityType entityType) {
+        this.entityType = entityType;
+      }
+    }
+
+    enum AbstractEntityType {
+      BLOCK
     }
   }
 

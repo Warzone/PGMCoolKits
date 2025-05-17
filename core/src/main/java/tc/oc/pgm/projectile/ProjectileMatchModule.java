@@ -7,7 +7,6 @@ import com.google.common.collect.ImmutableSet;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.function.BooleanSupplier;
@@ -60,8 +59,9 @@ import tc.oc.pgm.util.bukkit.MetadataUtils;
 import tc.oc.pgm.util.bukkit.entities.BlockEntity;
 import tc.oc.pgm.util.inventory.InventoryUtils;
 import tc.oc.pgm.util.nms.NMSHacks;
-import tc.oc.pgm.util.nms.packets.EntityPackets;
+import tc.oc.pgm.util.nms.packets.BlockEntity;
 import tc.oc.pgm.util.nms.packets.FakeEntity;
+import tc.oc.pgm.util.nms.packets.Packet;
 
 @ListenerScope(MatchScope.RUNNING)
 public class ProjectileMatchModule implements MatchModule, Listener {
@@ -101,36 +101,42 @@ public class ProjectileMatchModule implements MatchModule, Listener {
     // Prevent the original projectile from being fired
     event.setCancelled(true);
 
-    if (this.isCooldownActive(player, definition)) return;
-
-    var projType = definition.projectile;
-    boolean needsEvent = true;
-    Vector velocity = player.getEyeLocation().getDirection().multiply(definition.velocity);
-    Entity projectile = null;
-    try {
-      assertTrue(launchingDefinition.get() == null, "nested projectile launch");
-      launchingDefinition.set(definition);
-      switch (projType) {
-        case ProjectileDefinition.RealEntity(Class<? extends Entity> entityType) -> {
-          if (Projectile.class.isAssignableFrom(entityType)) {
-            needsEvent = false;
-
-            projectile = player.launchProjectile(entityType.asSubclass(Projectile.class), velocity);
-            if (projectile instanceof Fireball fireball && definition.precise) {
-              NMSHacks.NMS_HACKS.setFireballDirection(fireball, velocity);
-            }
+      boolean realProjectile = false;
+      if (projectileDefinition.projectile instanceof ProjectileDefinition.ProjectileEntity.RealEntity) {
+        realProjectile = Projectile.class.isAssignableFrom(
+            ((ProjectileDefinition.ProjectileEntity.RealEntity) projectileDefinition.projectile).entityType
+        );
+      }
+      Vector velocity =
+          player.getEyeLocation().getDirection().multiply(projectileDefinition.velocity);
+      Entity projectile;
+      BlockEntity blockEntity = null;
+      try {
+        assertTrue(launchingDefinition.get() == null, "nested projectile launch");
+        launchingDefinition.set(projectileDefinition);
+        if (realProjectile) {
+          projectile = player.launchProjectile(
+            (((ProjectileDefinition.ProjectileEntity.RealEntity) projectileDefinition.projectile).entityType)
+              .asSubclass(Projectile.class),
+              velocity
+          );
+          if (projectile instanceof Fireball fireball && projectileDefinition.precise) {
+            NMSHacks.NMS_HACKS.setFireballDirection(fireball, velocity);
+          }
+        } else {
+          if (FallingBlock.class.isAssignableFrom((((ProjectileDefinition.ProjectileEntity.RealEntity) projectileDefinition.projectile).entityType))) {
+            projectile =
+                projectileDefinition.blockMaterial.spawnFallingBlock(player.getEyeLocation());
           } else {
             Location loc = player.getEyeLocation();
-            ENTITIES.
-            // if (fakeBlockEntity.needsYadayadayada()) {
-            //
-            //}
-            if (NMSHacks.NMS_HACKS.isBlockDisplayEntity(projectileDefinition.projectile)) {
+            blockEntity = ENTITIES.spawnBlockEntity(loc, projectileDefinition.blockMaterial);
+            if (blockEntity.isDisplayEntity()) {
               loc.setPitch(0);
               loc.setYaw(0);
             }
-            projectile =
-                player.getWorld().spawn(loc, projectileDefinition.projectile);
+            projectile = blockEntity.entity();
+//            projectile =
+//                player.getWorld().spawn(loc, projectileDefinition.projectile);
           }
         }
         case ProjectileDefinition.BlockEntityType ce -> {
@@ -138,16 +144,18 @@ public class ProjectileMatchModule implements MatchModule, Listener {
           var be = BlockEntity.spawnBlockEntity(loc, definition.blockMaterial, ce.size(), velocity);
           new BlockRunner(definition, be, player, loc);
         }
-        if (NMSHacks.NMS_HACKS.isBlockDisplayEntity(projectileDefinition.projectile)) {
+        if (blockEntity != null && blockEntity.isDisplayEntity()) {
           Location loc = player.getEyeLocation();
-          NMSHacks.NMS_HACKS.alignBlockDisplayToPlayerFacing(
-              projectile,
-              loc.getPitch(),
-              loc.getYaw(),
-              projectileDefinition.scale
-          );
+          blockEntity.align(loc.getPitch(), loc.getYaw(), projectileDefinition.scale);
+//          NMSHacks.NMS_HACKS.alignBlockDisplayToPlayerFacing(
+//              projectile,
+//              loc.getPitch(),
+//              loc.getYaw(),
+//              projectileDefinition.scale
+//          );
 
-          NMSHacks.NMS_HACKS.setBlockDisplayBlock(projectile, projectileDefinition.blockMaterial.getItemType());
+//          NMSHacks.NMS_HACKS.setBlockDisplayBlock(projectile, projectileDefinition.blockMaterial.getItemType());
+          blockEntity.setBlock(projectileDefinition.blockMaterial.getItemType());
 
           final Vector normalizedDirection = player.getLocation().getDirection().normalize();
           final LinearProjectilePath linearProjectilePath = new LinearProjectilePath(
@@ -162,6 +170,7 @@ public class ProjectileMatchModule implements MatchModule, Listener {
           //
           // )
           //
+          BlockEntity finalBlockEntity = blockEntity;
           runFixedTimesAtPeriod(
               match.getExecutor(MatchScope.RUNNING),
               new BooleanSupplier() {
@@ -170,7 +179,8 @@ public class ProjectileMatchModule implements MatchModule, Listener {
 
                 @Override
                 public boolean getAsBoolean() {
-                  NMSHacks.NMS_HACKS.setTeleportationDuration(projectile, 1);
+//                  NMSHacks.NMS_HACKS.setTeleportationDuration(projectile, 1);
+                  finalBlockEntity.setTeleportationDuration(1);
 
                   Location currentLocation = projectile.getLocation();
                   Location incrementingLocation = currentLocation.clone();
