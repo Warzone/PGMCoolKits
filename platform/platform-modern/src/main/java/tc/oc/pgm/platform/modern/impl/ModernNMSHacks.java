@@ -1,9 +1,19 @@
 package tc.oc.pgm.platform.modern.impl;
 
+import static tc.oc.pgm.util.nms.Packets.ENTITIES;
+import static tc.oc.pgm.util.platform.Supports.Variant.PAPER;
+
 import com.destroystokyo.paper.profile.ProfileProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Dynamic;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.logging.Level;
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -77,17 +87,6 @@ import tc.oc.pgm.util.material.BlockMaterialData;
 import tc.oc.pgm.util.nms.NMSHacks;
 import tc.oc.pgm.util.platform.Supports;
 import tc.oc.pgm.util.skin.Skin;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.logging.Level;
-
-import static tc.oc.pgm.util.nms.Packets.ENTITIES;
-import static tc.oc.pgm.util.platform.Supports.Variant.PAPER;
 
 @Supports(value = PAPER, minVersion = "1.20.6")
 public class ModernNMSHacks implements NMSHacks {

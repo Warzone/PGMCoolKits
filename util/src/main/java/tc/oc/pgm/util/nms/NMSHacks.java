@@ -1,5 +1,7 @@
 package tc.oc.pgm.util.nms;
 
+import java.util.List;
+import java.util.UUID;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -17,9 +19,6 @@ import org.bukkit.util.Vector;
 import tc.oc.pgm.util.material.BlockMaterialData;
 import tc.oc.pgm.util.platform.Platform;
 import tc.oc.pgm.util.skin.Skin;
-
-import java.util.List;
-import java.util.UUID;
 
 public interface NMSHacks {
   NMSHacks NMS_HACKS = Platform.get(NMSHacks.class);
@@ -59,6 +58,4 @@ public interface NMSHacks {
   int getMaxWorldSize(World world);
 
   int allocateEntityId();
-
-  boolean isBlockDisplayEntity(Class<? extends Entity> entity);
 }
