@@ -61,7 +61,6 @@ import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.entity.CraftFirework;
 import org.bukkit.craftbukkit.generator.CraftWorldInfo;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
-import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Firework;
@@ -449,10 +448,5 @@ public class ModernNMSHacks implements NMSHacks {
   @Override
   public int allocateEntityId() {
     return Bukkit.getUnsafe().nextEntityId();
-  }
-
-  @Override
-  public boolean isBlockDisplayEntity(Class<? extends Entity> entity) {
-    return entity.isAssignableFrom(BlockDisplay.class);
   }
 }
