@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Table;
 import java.util.function.Function;
 import tc.oc.pgm.action.Action;
+import tc.oc.pgm.api.location.MatchLocation;
 import tc.oc.pgm.api.match.Match;
 import tc.oc.pgm.api.party.Party;
 import tc.oc.pgm.api.player.MatchPlayer;
@@ -73,6 +74,10 @@ public class ScopeSwitchAction<O, I> extends AbstractAction<O> {
       registerSingle(single, MatchPlayer.class, Match.class, MatchPlayer::getMatch);
       registerSingle(single, MatchPlayer.class, Party.class, MatchPlayer::getParty);
       registerSingle(single, Party.class, Match.class, Party::getMatch);
+      registerSingle(
+          single, MatchPlayer.class, MatchLocation.class,
+          (mp) -> new MatchLocation(mp.getMatch(), mp.getBukkit().getLocation())
+      );
 
       ImmutableTable.Builder<Class, Class, Function> multi = ImmutableTable.builder();
       registerMulti(multi, Match.class, Party.class, Match::getParties);
