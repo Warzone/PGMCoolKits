@@ -16,6 +16,7 @@ import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.jdom2.Element;
 import org.jetbrains.annotations.Nullable;
@@ -33,6 +34,7 @@ import tc.oc.pgm.action.actions.ReplaceItemAction;
 import tc.oc.pgm.action.actions.ScopeSwitchAction;
 import tc.oc.pgm.action.actions.SetVariableAction;
 import tc.oc.pgm.action.actions.SoundAction;
+import tc.oc.pgm.action.actions.SummonAction;
 import tc.oc.pgm.action.actions.TakePaymentAction;
 import tc.oc.pgm.action.actions.TeamAliasAction;
 import tc.oc.pgm.action.actions.TeleportAction;
@@ -505,5 +507,11 @@ public class ActionParser {
   public PickupFlagAction parsePickupFlag(Element el, Class<?> scope) throws InvalidXMLException {
     return new PickupFlagAction(
         parser.reference(FlagDefinition.class, el, "flag").required());
+  }
+
+  @MethodParser("summon")
+  public SummonAction parseSummon(Element el, Class<?> scope) throws InvalidXMLException {
+    var entityType = parser.parseEnum(EntityType.class, el, "type").required();
+    return new SummonAction(entityType);
   }
 }
