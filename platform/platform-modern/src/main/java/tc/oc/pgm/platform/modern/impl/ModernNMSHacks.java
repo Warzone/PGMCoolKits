@@ -457,7 +457,7 @@ public class ModernNMSHacks implements NMSHacks {
   }
 
   @Override
-  public boolean collidesWithBlock(Location center, double halfSize, Vector delta, int substeps, Vector substep) {
+  public Location collidesWithBlock(Location center, double halfSize, Vector delta, int substeps, Vector substep) {
     Location pos = center.clone();
     AABB AABB = new AABB(
       pos.getX() - halfSize + Math.min(0, delta.getX()),
@@ -483,12 +483,12 @@ public class ModernNMSHacks implements NMSHacks {
         );
 
         if (!world.getHandle().getLevel().noCollision(null, AABB)) {
-        return true;
+          return pos;
         }
         pos.add(substep);
       }
     }
-    return false;
+    return null;
   }
 
   @Override

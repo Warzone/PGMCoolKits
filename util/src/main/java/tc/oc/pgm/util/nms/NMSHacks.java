@@ -61,7 +61,7 @@ public interface NMSHacks {
 
   int allocateEntityId();
 
-  boolean collidesWithBlock(Location center, double halfSize, Vector delta, int substeps, Vector substep);
+  Location collidesWithBlock(Location center, double halfSize, Vector delta, int substeps, Vector substep);
 
   Entity collidesWithPlayer(Location center, double halfSize, Vector delta, Predicate<Entity> predicate);
 }

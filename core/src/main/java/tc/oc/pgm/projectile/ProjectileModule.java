@@ -15,10 +15,12 @@ import org.bukkit.potion.PotionEffect;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import tc.oc.pgm.api.filter.Filter;
+import tc.oc.pgm.api.location.MatchLocation;
 import tc.oc.pgm.api.map.MapModule;
 import tc.oc.pgm.api.map.factory.MapFactory;
 import tc.oc.pgm.api.map.factory.MapModuleFactory;
 import tc.oc.pgm.api.match.Match;
+import tc.oc.pgm.api.player.MatchPlayer;
 import tc.oc.pgm.filters.FilterModule;
 import tc.oc.pgm.filters.parse.FilterParser;
 import tc.oc.pgm.kits.KitParser;
@@ -59,6 +61,9 @@ public class ProjectileModule implements MapModule<ProjectileMatchModule> {
         String name = projectileElement.getAttributeValue("name");
         Double damage = XMLUtils.parseNumber(
             projectileElement.getAttribute("damage"), Double.class, (Double) null);
+        if (damage != null && damage == 0.0d) {
+          damage = null;
+        }
         double velocity = XMLUtils.parseNumber(
             Node.fromChildOrAttr(projectileElement, "velocity"), Double.class, 1.0);
         ClickAction clickAction = XMLUtils.parseEnum(
@@ -77,6 +82,13 @@ public class ProjectileModule implements MapModule<ProjectileMatchModule> {
         boolean throwable =
             XMLUtils.parseBoolean(projectileElement.getAttribute("throwable"), true);
         boolean precise = XMLUtils.parseBoolean(projectileElement.getAttribute("precise"), true);
+        var parser = factory.getParser();
+        var onHitBlockAction = parser.action(
+            MatchLocation.class, projectileElement, "on-hit-block-action"
+        ).orNull();
+        var onHitPlayerAction = parser.action(
+            MatchPlayer.class, projectileElement, "on-hit-player-action"
+        ).orNull();
 
         ProjectileDefinition projectileDefinition = new ProjectileDefinition(
             id,
@@ -91,7 +103,9 @@ public class ProjectileModule implements MapModule<ProjectileMatchModule> {
             coolDown,
             throwable,
             precise,
-            blockMaterial);
+            blockMaterial,
+            onHitBlockAction,
+            onHitPlayerAction);
 
         factory.getFeatures().addFeature(projectileElement, projectileDefinition);
         projectiles.add(projectileDefinition);

@@ -232,7 +232,7 @@ public class SpNMSHacks implements NMSHacks {
   }
 
   @Override
-  public boolean collidesWithBlock(Location center, double halfSize, Vector delta, int substeps, Vector substep) {
+  public Location collidesWithBlock(Location center, double halfSize, Vector delta, int substeps, Vector substep) {
     Location pos = center.clone();
     
     AxisAlignedBB AABB = new AxisAlignedBB(
@@ -259,12 +259,12 @@ public class SpNMSHacks implements NMSHacks {
         );
 
         if (!world.getCubes(null, AABB).isEmpty()) {
-        return true;
+          return pos;
         }
         pos.add(substep);
       }
     }
-    return false;
+    return null;
   }
 
   @Override
