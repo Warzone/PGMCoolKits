@@ -6,7 +6,10 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.Nullable;
+import tc.oc.pgm.action.Action;
 import tc.oc.pgm.api.filter.Filter;
+import tc.oc.pgm.api.location.MatchLocation;
+import tc.oc.pgm.api.player.MatchPlayer;
 import tc.oc.pgm.features.SelfIdentifyingFeatureDefinition;
 import tc.oc.pgm.util.material.BlockMaterialData;
 
@@ -23,6 +26,8 @@ public class ProjectileDefinition extends SelfIdentifyingFeatureDefinition {
   protected boolean throwable;
   protected boolean precise;
   protected BlockMaterialData blockMaterial;
+  protected final Action<? super MatchLocation> onHitBlockAction;
+  protected final Action<? super MatchPlayer> onHitPlayerAction;
 
   public ProjectileDefinition(
       @Nullable String id,
@@ -37,7 +42,9 @@ public class ProjectileDefinition extends SelfIdentifyingFeatureDefinition {
       Duration coolDown,
       boolean throwable,
       boolean precise,
-      BlockMaterialData blockMaterial) {
+      BlockMaterialData blockMaterial,
+      Action<? super MatchLocation> onHitBlockAction,
+      Action<? super MatchPlayer> onHitPlayerAction) {
     super(id);
     this.name = name;
     this.damage = damage;
@@ -51,6 +58,8 @@ public class ProjectileDefinition extends SelfIdentifyingFeatureDefinition {
     this.throwable = throwable;
     this.precise = precise;
     this.blockMaterial = blockMaterial;
+    this.onHitBlockAction = onHitBlockAction;
+    this.onHitPlayerAction = onHitPlayerAction;
   }
 
   public sealed interface ProjectileEntity permits RealEntity, BlockEntityType {

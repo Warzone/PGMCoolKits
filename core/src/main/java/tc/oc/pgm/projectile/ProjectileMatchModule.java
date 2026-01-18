@@ -40,6 +40,7 @@ import tc.oc.pgm.api.PGM;
 import tc.oc.pgm.api.event.BlockTransformEvent;
 import tc.oc.pgm.api.filter.Filter;
 import tc.oc.pgm.api.filter.query.Query;
+import tc.oc.pgm.api.location.MatchLocation;
 import tc.oc.pgm.api.match.Match;
 import tc.oc.pgm.api.match.MatchModule;
 import tc.oc.pgm.api.match.MatchScope;
@@ -177,6 +178,13 @@ public class ProjectileMatchModule implements MatchModule, Listener {
       if (projectileDefinition.damage != null) {
         event.setDamage(projectileDefinition.damage);
       }
+
+      if (damagedEntity instanceof Player loser) {
+        if (projectileDefinition.onHitPlayerAction != null) {
+          var mp = match.getPlayer(loser);
+          projectileDefinition.onHitPlayerAction.trigger(mp);
+        }
+      }
     }
   }
 
@@ -218,6 +226,10 @@ public class ProjectileMatchModule implements MatchModule, Listener {
         if (!bte.isCancelled()) {
           hitBlock.setType(Material.AIR);
           projectile.remove();
+        }
+
+        if (projectileDefinition.onHitBlockAction != null) {
+          projectileDefinition.onHitBlockAction.trigger(new MatchLocation(match, hitBlock.getLocation()));
         }
       }
     }
@@ -369,13 +381,27 @@ public class ProjectileMatchModule implements MatchModule, Listener {
 
     private boolean blockDisplayCollision(Location location) {
       double halfSize = 0.5 * ce.size();
-      
-      if (ce.solidBlockCollision() && NMSHacks.NMS_HACKS.collidesWithBlock(currentLocation, halfSize, increment, substeps, substep)) {
-        return true;
+
+      if (ce.solidBlockCollision()) {
+        var blockCollisionLocation = NMSHacks.NMS_HACKS.collidesWithBlock(
+            currentLocation, halfSize, increment, substeps, substep
+        );
+        if (blockCollisionLocation != null) {
+          if (definition.onHitBlockAction != null) {
+            definition.onHitBlockAction.trigger(new MatchLocation(match, blockCollisionLocation));
+          }
+          return true;
+        }
       }
       if (definition.damage != null) {
         Entity hitEntity = NMSHacks.NMS_HACKS.collidesWithPlayer(location, halfSize, increment, this::isEnemyPlayer);
         if (hitEntity != null) {
+          if (definition.onHitPlayerAction != null) {
+            var hitPlayer = match.getPlayer(hitEntity);
+            if (hitPlayer != null) {
+              definition.onHitPlayerAction.trigger(hitPlayer);
+            }
+          }
           ((Player) hitEntity).damage(definition.damage, player);
           return true;
         }

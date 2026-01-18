@@ -1,6 +1,8 @@
 package tc.oc.pgm.api.filter;
 
 import java.util.List;
+
+import tc.oc.pgm.api.location.MatchLocation;
 import tc.oc.pgm.api.match.Match;
 import tc.oc.pgm.api.party.Party;
 import tc.oc.pgm.api.player.MatchPlayer;
@@ -12,9 +14,10 @@ public interface Filterables {
   Class<Match> MATCH = Match.class;
   Class<Party> PARTY = Party.class;
   Class<MatchPlayer> PLAYER = MatchPlayer.class;
+  Class<MatchLocation> LOCATION = MatchLocation.class;
 
   /** {@link Filterable}s ordered from general to specific */
-  List<Class<? extends Filterable<?>>> SCOPES = List.of(MATCH, PARTY, PLAYER);
+  List<Class<? extends Filterable<?>>> SCOPES = List.of(MATCH, PARTY, PLAYER, LOCATION);
 
   /**
    * Return the "scope" of the given filter, which is the most general {@link Filterable} type that
@@ -53,6 +56,7 @@ public interface Filterables {
           case "player" -> PLAYER;
           case "team" -> PARTY;
           case "match" -> MATCH;
+          case "location" -> LOCATION;
           default -> throw new InvalidXMLException(
               "Unknown scope, must be one of: player, team, match", node);
         };
