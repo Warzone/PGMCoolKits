@@ -53,6 +53,7 @@ import tc.oc.pgm.api.filter.Filter;
 import tc.oc.pgm.api.map.factory.MapFactory;
 import tc.oc.pgm.api.player.MatchPlayer;
 import tc.oc.pgm.consumable.ConsumableDefinition;
+import tc.oc.pgm.disguise.DisguiseKit;
 import tc.oc.pgm.doublejump.DoubleJumpKit;
 import tc.oc.pgm.filters.matcher.StaticFilter;
 import tc.oc.pgm.kits.tag.Grenade;
@@ -64,6 +65,7 @@ import tc.oc.pgm.shield.ShieldParameters;
 import tc.oc.pgm.teams.TeamFactory;
 import tc.oc.pgm.teams.Teams;
 import tc.oc.pgm.util.bukkit.BukkitUtils;
+import tc.oc.pgm.util.entity.EntitySpecification;
 import tc.oc.pgm.util.inventory.ArmorType;
 import tc.oc.pgm.util.inventory.InventoryUtils;
 import tc.oc.pgm.util.inventory.ItemMatcher;
@@ -151,6 +153,7 @@ public abstract class KitParser {
     kits.add(this.parseKnockbackReductionKit(el));
     kits.add(this.parseWalkSpeedKit(el));
     kits.add(this.parseDoubleJumpKit(el));
+    kits.add(this.parseDisguiseKit(el));
     kits.add(this.parseEnderPearlKit(el));
     kits.add(this.parseFlyKit(el));
     kits.add(this.parseGameModeKit(el));
@@ -751,6 +754,17 @@ public abstract class KitParser {
           XMLUtils.parseBoolean(child.getAttribute("recharge-before-landing"), false);
 
       return new DoubleJumpKit(enabled, power, rechargeTime, rechargeInAir);
+    } else {
+      return null;
+    }
+  }
+
+  public DisguiseKit parseDisguiseKit(Element parent) throws InvalidXMLException {
+    Element child = XMLUtils.getUniqueChild(parent, "disguise");
+
+    if (child != null) {
+      EntitySpecification entitySpec = factory.getParser().entity(child).required();
+      return new DisguiseKit(entitySpec);
     } else {
       return null;
     }

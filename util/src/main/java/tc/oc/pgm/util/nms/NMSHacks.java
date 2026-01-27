@@ -31,6 +31,8 @@ public interface NMSHacks {
 
   void freezeEntity(Entity entity);
 
+  void setEntityAi(Entity entity, boolean ai);
+
   void setFireballDirection(Fireball entity, Vector direction);
 
   long getMonotonicTime(World world);

@@ -119,6 +119,13 @@ public class ModernNMSHacks implements NMSHacks {
   }
 
   @Override
+  public void setEntityAi(Entity entity, boolean ai) {
+    if (((CraftEntity) entity).getHandle() instanceof Mob mob) {
+      mob.setNoAi(!ai);
+    }
+  }
+
+  @Override
   public void setFireballDirection(Fireball entity, Vector direction) {
     entity.setAcceleration(direction.multiply(0.1D));
   }

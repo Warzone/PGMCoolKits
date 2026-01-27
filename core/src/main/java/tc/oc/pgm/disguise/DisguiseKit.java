@@ -2,24 +2,26 @@ package tc.oc.pgm.disguise;
 
 import java.util.List;
 
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 
 import tc.oc.pgm.api.player.MatchPlayer;
 import tc.oc.pgm.kits.AbstractKit;
+import tc.oc.pgm.util.entity.EntitySpecification;
+
+import static tc.oc.pgm.util.nms.NMSHacks.NMS_HACKS;
 
 public class DisguiseKit extends AbstractKit{
-  private final LivingEntity disguiseType;
-  protected final boolean enabled;
+  public final EntitySpecification entitySpec;
 
-  public  DisguiseKit(LivingEntity mobDisguiseType, boolean enabled) {
-    this.disguiseType = mobDisguiseType;
-    this.enabled = enabled;
+  public DisguiseKit(EntitySpecification entitySpec) {
+    this.entitySpec = entitySpec;
   }
 
   @Override
   public void applyPostEvent(MatchPlayer player, boolean force, List<ItemStack> displacedItems) {
-    applyKit(player, this);
+    applyKit(player);
   }
 
   @Override
@@ -29,11 +31,15 @@ public class DisguiseKit extends AbstractKit{
 
   @Override
   public void remove(MatchPlayer player) {
-    applyKit(player, null);
+    DisguiseMatchModule dmm = player.getMatch().getModule(DisguiseMatchModule.class);
+    if (dmm != null) dmm.setDisguise(player.getBukkit(), null);
   }
 
-  private void applyKit(MatchPlayer player, DisguiseKit kit) {
+  private void applyKit(MatchPlayer player) {
+    LivingEntity entity = entitySpec.spawn(player.getBukkit().getWorld(), player.getBukkit().getLocation());
+    NMS_HACKS.setEntityAi(entity, false);
+
     DisguiseMatchModule dmm = player.getMatch().getModule(DisguiseMatchModule.class);
-    if (dmm != null) dmm.setKit(player.getBukkit(), kit);
+    if (dmm != null) dmm.setDisguise(player.getBukkit(), entity);
   }
 }

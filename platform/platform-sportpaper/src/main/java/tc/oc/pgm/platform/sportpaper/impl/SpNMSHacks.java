@@ -79,6 +79,15 @@ public class SpNMSHacks implements NMSHacks {
   }
 
   @Override
+  public void setEntityAi(Entity entity, boolean ai) {
+    net.minecraft.server.v1_8_R3.Entity nmsEntity = ((CraftEntity) entity).getHandle();
+    NBTTagCompound tag = new NBTTagCompound();
+    nmsEntity.c(tag); // save to tag
+    tag.setBoolean("NoAI", !ai);
+    nmsEntity.f(tag); // load from tag
+  }
+
+  @Override
   public void setFireballDirection(Fireball entity, Vector direction) {
     EntityFireball fireball = ((CraftFireball) entity).getHandle();
     fireball.dirX = direction.getX() * 0.1D;

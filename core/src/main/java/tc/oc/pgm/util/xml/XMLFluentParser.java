@@ -25,6 +25,7 @@ import tc.oc.pgm.util.text.TextFormatter;
 import tc.oc.pgm.util.text.TextParser;
 import tc.oc.pgm.util.xml.parsers.BoolBuilder;
 import tc.oc.pgm.util.xml.parsers.Builder;
+import tc.oc.pgm.util.xml.parsers.EntityBuilder;
 import tc.oc.pgm.util.xml.parsers.FilterBuilder;
 import tc.oc.pgm.util.xml.parsers.ItemBuilder;
 import tc.oc.pgm.util.xml.parsers.NumberBuilder;
@@ -157,6 +158,10 @@ public class XMLFluentParser {
 
   public RegionBuilder<Region.Static> staticRegion(Element el, String... prop) {
     return new RegionBuilder.OfStatic(regions, el, prop);
+  }
+
+  public EntityBuilder entity(Element el, String... prop) {
+    return new EntityBuilder(el, prop);
   }
 
   public ItemBuilder item(Element el, String... prop) {
