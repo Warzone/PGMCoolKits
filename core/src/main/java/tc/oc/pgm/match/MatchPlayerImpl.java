@@ -1,22 +1,5 @@
 package tc.oc.pgm.match;
 
-import static tc.oc.pgm.util.Assert.assertNotNull;
-import static tc.oc.pgm.util.nms.NMSHacks.NMS_HACKS;
-import static tc.oc.pgm.util.nms.Packets.ENTITIES;
-import static tc.oc.pgm.util.nms.PlayerUtils.PLAYER_UTILS;
-import static tc.oc.pgm.util.player.PlayerComponent.player;
-
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Logger;
 import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -48,6 +31,7 @@ import tc.oc.pgm.api.setting.SettingKey;
 import tc.oc.pgm.api.setting.SettingValue;
 import tc.oc.pgm.api.setting.Settings;
 import tc.oc.pgm.api.time.Tick;
+import tc.oc.pgm.disguise.DisguiseMatchModule;
 import tc.oc.pgm.events.PlayerResetEvent;
 import tc.oc.pgm.filters.Filterable;
 import tc.oc.pgm.kits.Kit;
@@ -60,6 +44,24 @@ import tc.oc.pgm.util.TimeUtils;
 import tc.oc.pgm.util.bukkit.ViaUtils;
 import tc.oc.pgm.util.listener.AfkTracker;
 import tc.oc.pgm.util.named.NameStyle;
+
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Logger;
+
+import static tc.oc.pgm.util.Assert.assertNotNull;
+import static tc.oc.pgm.util.nms.NMSHacks.NMS_HACKS;
+import static tc.oc.pgm.util.nms.Packets.ENTITIES;
+import static tc.oc.pgm.util.nms.PlayerUtils.PLAYER_UTILS;
+import static tc.oc.pgm.util.player.PlayerComponent.player;
 
 public class MatchPlayerImpl implements MatchPlayer, Comparable<MatchPlayer> {
 
@@ -205,6 +207,7 @@ public class MatchPlayerImpl implements MatchPlayer, Comparable<MatchPlayer> {
 
   @Override
   public boolean canSee(MatchPlayer other) {
+    if (!this.equals(other) && other.isDisguised()) return false;
     @Nullable MatchPlayer spectatorTarget = this.getSpectatorTarget();
     boolean isSpectatorTarget =
         spectatorTarget != null && spectatorTarget.getId().equals(other.getId());
@@ -246,6 +249,7 @@ public class MatchPlayerImpl implements MatchPlayer, Comparable<MatchPlayer> {
     PLAYER_UTILS.showInvisibles(bukkit, isObserving());
 
     for (MatchPlayer other : getMatch().getPlayers()) {
+      if (other.equals(this)) continue;
       if (canSee(other)) {
         bukkit.showPlayer(other.getBukkit());
       } else {
@@ -467,6 +471,15 @@ public class MatchPlayerImpl implements MatchPlayer, Comparable<MatchPlayer> {
   @Override
   public List<MatchPlayer> getSpectators() {
     return match.needModule(SpectateMatchModule.class).getSpectating(this);
+  }
+
+  @Override
+  public boolean isDisguised() {
+    var disguiseMatchModule = match.getModule(DisguiseMatchModule.class);
+    if (disguiseMatchModule != null) {
+      return disguiseMatchModule.isDisguised(getBukkit());
+    }
+    return false;
   }
 
   @Override

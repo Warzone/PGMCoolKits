@@ -285,6 +285,13 @@ public interface MatchPlayer
    */
   List<MatchPlayer> getSpectators();
 
+  /**
+   * Return whether the player is disguised, if they have an active {@link tc.oc.pgm.disguise.PlayerDisguise}
+   *
+   * @return if the player is disguised
+   */
+  boolean isDisguised();
+
   @Deprecated
   void internalSetParty(Party party);
 

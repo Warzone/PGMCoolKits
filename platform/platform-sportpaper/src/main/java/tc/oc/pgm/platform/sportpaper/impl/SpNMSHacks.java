@@ -307,4 +307,7 @@ public class SpNMSHacks implements NMSHacks {
 
     return null;
   }
+  public void hideEntityForPlayer(Plugin plugin, Player player, Entity entity) {
+    throw new RuntimeException("hideEntityForPlayer is not supported in this version");
+  }
 }

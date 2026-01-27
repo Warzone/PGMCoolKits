@@ -1,14 +1,12 @@
 package tc.oc.pgm.platform.modern.impl;
 
-import static tc.oc.pgm.util.nms.Packets.ENTITIES;
-import static tc.oc.pgm.util.platform.Supports.Variant.PAPER;
-
 import com.destroystokyo.paper.profile.ProfileProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.Lifecycle;
 import io.papermc.paper.world.PaperWorldLoader;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,6 +15,7 @@ import java.util.OptionalLong;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.logging.Level;
+
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
@@ -92,6 +91,9 @@ import tc.oc.pgm.util.material.BlockMaterialData;
 import tc.oc.pgm.util.nms.NMSHacks;
 import tc.oc.pgm.util.platform.Supports;
 import tc.oc.pgm.util.skin.Skin;
+
+import static tc.oc.pgm.util.nms.Packets.ENTITIES;
+import static tc.oc.pgm.util.platform.Supports.Variant.PAPER;
 
 @Supports(value = PAPER, minVersion = "1.21.9")
 public class ModernNMSHacks implements NMSHacks {
@@ -504,5 +506,9 @@ public class ModernNMSHacks implements NMSHacks {
   public Entity collidesWithPlayer(Location center, double halfSize, Vector delta, Predicate<Entity> predicate) {
     RayTraceResult result = center.getWorld().rayTraceEntities(center, delta.normalize(), delta.length(), halfSize, predicate);
     return result != null ? result.getHitEntity() : null;
+  }
+  
+  public void hideEntityForPlayer(Plugin plugin, Player player, Entity entity) {
+    player.hideEntity(plugin, entity);
   }
 }

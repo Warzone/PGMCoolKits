@@ -3,6 +3,7 @@ package tc.oc.pgm.disguise;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import tc.oc.pgm.api.PGM;
 import tc.oc.pgm.util.entity.EntitySpecification;
 
 import java.util.concurrent.Future;
@@ -32,6 +33,7 @@ public class PlayerDisguise {
 
         LivingEntity entity = entitySpec.spawn(player.getWorld(), player.getLocation());
         NMS_HACKS.setEntityAi(entity, false);
+        NMS_HACKS.hideEntityForPlayer(PGM.get(), player, entity);
         disguise = entity;
         tickFuture = scheduledExecutorService.scheduleAtFixedRate(this::tick, 0L, 50L, TimeUnit.MILLISECONDS);
     }

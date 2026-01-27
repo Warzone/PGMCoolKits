@@ -66,4 +66,6 @@ public interface NMSHacks {
   Location collidesWithBlock(Location center, double halfSize, Vector delta, int substeps, Vector substep);
 
   Entity collidesWithPlayer(Location center, double halfSize, Vector delta, Predicate<Entity> predicate);
+
+  void hideEntityForPlayer(Plugin plugin, Player player, Entity entity);
 }
