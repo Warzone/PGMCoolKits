@@ -1,6 +1,5 @@
 package tc.oc.pgm.util.xml.parsers;
 
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.jdom2.Attribute;
 import org.jdom2.Element;

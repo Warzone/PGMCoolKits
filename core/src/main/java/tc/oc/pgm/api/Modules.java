@@ -39,6 +39,7 @@ import tc.oc.pgm.damagehistory.DamageHistoryMatchModule;
 import tc.oc.pgm.death.DeathMessageMatchModule;
 import tc.oc.pgm.destroyable.DestroyableMatchModule;
 import tc.oc.pgm.destroyable.DestroyableModule;
+import tc.oc.pgm.disguise.DisguiseMatchModule;
 import tc.oc.pgm.doublejump.DoubleJumpMatchModule;
 import tc.oc.pgm.enderchest.EnderChestMatchModule;
 import tc.oc.pgm.enderchest.EnderChestModule;
@@ -225,6 +226,7 @@ public final class Modules {
     register(ViewInventoryMatchModule.class, ViewInventoryMatchModule::new);
     register(CycleMatchModule.class, CycleMatchModule::new);
     register(DoubleJumpMatchModule.class, DoubleJumpMatchModule::new);
+    register(DisguiseMatchModule.class, DisguiseMatchModule::new);
     register(ArrowRemovalMatchModule.class, ArrowRemovalMatchModule::new);
     register(SoundsMatchModule.class, new SoundsMatchModule.Factory());
     register(ObserverToolsMatchModule.class, new ObserverToolsMatchModule.Factory());
