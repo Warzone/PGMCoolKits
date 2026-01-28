@@ -75,7 +75,7 @@ public class DisguiseMatchModule implements MatchModule, Listener {
     public void setDisguise(Player player, @Nullable EntitySpecification entitySpec) {
         if (entitySpec != null) {
             PlayerDisguise disguisedPlayer = new PlayerDisguise(
-                player, entitySpec, match.getExecutor(MatchScope.LOADED)
+                player, entitySpec, PGM.get(),  match.getExecutor(MatchScope.LOADED)
             );
             disguisedPlayer.enable();
             this.playerDisguises.put(player, disguisedPlayer);

@@ -3,6 +3,13 @@ package tc.oc.pgm.disguise;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByBlockEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.plugin.Plugin;
 import tc.oc.pgm.api.PGM;
 import tc.oc.pgm.util.entity.EntitySpecification;
 
@@ -12,25 +19,29 @@ import java.util.concurrent.TimeUnit;
 
 import static tc.oc.pgm.util.nms.NMSHacks.NMS_HACKS;
 
-public class PlayerDisguise {
+public class PlayerDisguise implements Listener {
     private final Player player;
     private final EntitySpecification entitySpec;
     private final ScheduledExecutorService scheduledExecutorService;
+    private final Plugin plugin;
 
     private Future<?> tickFuture;
-    private Entity disguise;
+    private LivingEntity disguise;
 
     public PlayerDisguise(
-        Player player, EntitySpecification entitySpec, ScheduledExecutorService scheduledExecutorService
+        Player player, EntitySpecification entitySpec,
+        Plugin plugin, ScheduledExecutorService scheduledExecutorService
     ) {
         this.player = player;
         this.entitySpec = entitySpec;
+        this.plugin = plugin;
         this.scheduledExecutorService = scheduledExecutorService;
     }
 
     public void enable() {
         if (disguise != null) return;
 
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
         LivingEntity entity = entitySpec.spawn(player.getWorld(), player.getLocation());
         NMS_HACKS.setEntityAi(entity, false);
         NMS_HACKS.hideEntityForPlayer(PGM.get(), player, entity);
@@ -40,6 +51,7 @@ public class PlayerDisguise {
 
     public void disable() {
         if (disguise == null) return;
+        HandlerList.unregisterAll(this);
         disguise.remove();
         disguise = null;
         tickFuture.cancel(true);
@@ -49,5 +61,29 @@ public class PlayerDisguise {
     private void tick() {
         if (disguise == null) return;
         disguise.teleport(player);
+    }
+
+    @EventHandler
+    public void onDamage(final EntityDamageByEntityEvent event) {
+        if (!event.getEntity().equals(disguise)) return;
+        disguise.resetMaxHealth();
+        player.damage(event.getFinalDamage(), event.getDamager());
+
+        event.setDamage(0);
+    }
+
+    // reset health for all other cases
+    @EventHandler
+    public void onOtherDamage(final EntityDamageEvent event) {
+        if (!event.getEntity().equals(disguise) || event instanceof EntityDamageByEntityEvent) return;
+        disguise.resetMaxHealth();
+        event.setDamage(0);
+    }
+
+    @EventHandler
+    public void onEntityByBlockDamage(final EntityDamageByBlockEvent event) {
+        if (!event.getEntity().equals(disguise)) return;
+        disguise.resetMaxHealth();
+        event.setDamage(0);
     }
 }
