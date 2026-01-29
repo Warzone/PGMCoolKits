@@ -37,6 +37,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
@@ -309,5 +310,10 @@ public class SpNMSHacks implements NMSHacks {
   }
   public void hideEntityForPlayer(Plugin plugin, Player player, Entity entity) {
     throw new RuntimeException("hideEntityForPlayer is not supported in this version");
+  }
+
+  @Override
+  public void simulateProjectileHit(Projectile projectile, Entity target) {
+    throw new RuntimeException("simulateProjectileHit is not supported in this version");
   }
 }

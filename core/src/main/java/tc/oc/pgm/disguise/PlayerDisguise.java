@@ -3,6 +3,7 @@ package tc.oc.pgm.disguise;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -66,24 +67,32 @@ public class PlayerDisguise implements Listener {
     @EventHandler
     public void onDamage(final EntityDamageByEntityEvent event) {
         if (!event.getEntity().equals(disguise)) return;
-        disguise.resetMaxHealth();
-        player.damage(event.getFinalDamage(), event.getDamager());
-
-        event.setDamage(0);
+        propagateDamage(event.getDamager(), event.getFinalDamage(), event);
     }
 
-    // reset health for all other cases
     @EventHandler
     public void onOtherDamage(final EntityDamageEvent event) {
         if (!event.getEntity().equals(disguise) || event instanceof EntityDamageByEntityEvent) return;
-        disguise.resetMaxHealth();
-        event.setDamage(0);
+        propagateDamage(null, event.getFinalDamage(), event);
     }
 
     @EventHandler
     public void onEntityByBlockDamage(final EntityDamageByBlockEvent event) {
         if (!event.getEntity().equals(disguise)) return;
+        propagateDamage(null, event.getFinalDamage(), event);
+    }
+
+    private void propagateDamage(Entity damager, double damage, EntityDamageEvent event) {
         disguise.resetMaxHealth();
+        if (damager != null) {
+            if (damager instanceof Projectile projectile) {
+                NMS_HACKS.simulateProjectileHit(projectile, player);
+            } else {
+                player.damage(damage, damager);
+            }
+        } else {
+            player.damage(damage);
+        }
         event.setDamage(0);
     }
 }

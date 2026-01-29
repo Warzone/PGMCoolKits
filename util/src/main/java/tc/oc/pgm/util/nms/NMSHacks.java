@@ -13,6 +13,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -68,4 +69,6 @@ public interface NMSHacks {
   Entity collidesWithPlayer(Location center, double halfSize, Vector delta, Predicate<Entity> predicate);
 
   void hideEntityForPlayer(Plugin plugin, Player player, Entity entity);
+
+  void simulateProjectileHit(Projectile projectile, Entity target);
 }
