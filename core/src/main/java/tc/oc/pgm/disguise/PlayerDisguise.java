@@ -27,7 +27,7 @@ public class PlayerDisguise implements Listener {
     private final Plugin plugin;
 
     private Future<?> tickFuture;
-    private LivingEntity disguise;
+    private Entity disguise;
 
     public PlayerDisguise(
         Player player, EntitySpecification entitySpec,
@@ -43,7 +43,7 @@ public class PlayerDisguise implements Listener {
         if (disguise != null) return;
 
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        LivingEntity entity = entitySpec.spawn(player.getWorld(), player.getLocation());
+        Entity entity = entitySpec.spawn(player.getWorld(), player.getLocation());
         NMS_HACKS.setEntityAi(entity, false);
         NMS_HACKS.hideEntityForPlayer(PGM.get(), player, entity);
         disguise = entity;
@@ -83,7 +83,9 @@ public class PlayerDisguise implements Listener {
     }
 
     private void propagateDamage(Entity damager, double damage, EntityDamageEvent event) {
-        disguise.resetMaxHealth();
+        if (disguise instanceof LivingEntity livingDisguise) {
+            livingDisguise.resetMaxHealth();
+        }
         if (damager != null) {
             if (damager instanceof Projectile projectile) {
                 NMS_HACKS.simulateProjectileHit(projectile, player);

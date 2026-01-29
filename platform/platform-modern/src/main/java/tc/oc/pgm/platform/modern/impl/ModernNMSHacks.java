@@ -67,6 +67,7 @@ import org.bukkit.craftbukkit.entity.CraftFirework;
 import org.bukkit.craftbukkit.generator.CraftWorldInfo;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
@@ -542,5 +543,17 @@ public class ModernNMSHacks implements NMSHacks {
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void setFallingBlockType(Entity fallingBlock, BlockMaterialData blockMaterialData) {
+        if (fallingBlock instanceof FallingBlock && blockMaterialData instanceof ModernBlockMaterialData) {
+            ((FallingBlock) fallingBlock).setBlockData(((ModernBlockMaterialData) blockMaterialData).getBlock());
+        }
+    }
+
+    @Override
+    public void setNoGravity(Entity entity, boolean noGravity) {
+        entity.setGravity(!noGravity);
     }
 }

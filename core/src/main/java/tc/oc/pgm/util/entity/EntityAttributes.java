@@ -1,13 +1,18 @@
 package tc.oc.pgm.util.entity;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.FallingBlock;
+import tc.oc.pgm.util.material.MaterialData;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+
+import static tc.oc.pgm.util.nms.NMSHacks.NMS_HACKS;
 
 public class EntityAttributes {
     public static final EntityAttributes INSTANCE;
@@ -25,6 +30,19 @@ public class EntityAttributes {
             Creeper.class,
             (creeper, charged) -> ((Creeper) creeper).setPowered((boolean) charged)
         );
+        addAttributeFunction(
+            attributeFunctions,
+            "blockType", (s) -> Material.valueOf(s.replace(" ", "_").toUpperCase()),
+            FallingBlock.class,
+            (fallingBlock, blockMaterial) ->
+                NMS_HACKS.setFallingBlockType(fallingBlock, MaterialData.block((Material) blockMaterial))
+        );
+        addAttributeFunction(
+            attributeFunctions,
+            "noGravity", Boolean::parseBoolean,
+            Entity.class,
+            (entity, noGravity) -> NMS_HACKS.setNoGravity(entity, (boolean) noGravity)
+        );
 
         INSTANCE = new EntityAttributes(attributeFunctions);
     }
@@ -35,6 +53,9 @@ public class EntityAttributes {
         final Class<? extends Entity> classRequired,
         final BiConsumer<Entity, Object> function
     ) {
+        if (attributeFunctions.containsKey(key)) {
+            throw new RuntimeException("Duplicate entity attribute '" + key + "', this must be unique");
+        }
         attributeFunctions.put(key, new EntityAttributeDescription(classRequired, parser, function));
     }
 

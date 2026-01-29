@@ -71,4 +71,8 @@ public interface NMSHacks {
   void hideEntityForPlayer(Plugin plugin, Player player, Entity entity);
 
   void simulateProjectileHit(Projectile projectile, Entity target);
+
+  void setFallingBlockType(Entity fallingBlock, BlockMaterialData blockMaterialData);
+
+  void setNoGravity(Entity entity, boolean noGravity);
 }

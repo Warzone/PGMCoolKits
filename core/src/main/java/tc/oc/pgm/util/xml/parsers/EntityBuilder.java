@@ -1,10 +1,9 @@
 package tc.oc.pgm.util.xml.parsers;
 
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Entity;
 import org.jdom2.Attribute;
 import org.jdom2.Element;
 import org.jetbrains.annotations.Nullable;
-import tc.oc.pgm.util.StringUtils;
 import tc.oc.pgm.util.entity.EntityAttributes;
 import tc.oc.pgm.util.entity.EntitySpecification;
 import tc.oc.pgm.util.xml.InvalidXMLException;
@@ -28,7 +27,7 @@ public class EntityBuilder extends Builder<EntitySpecification, EntityBuilder> {
             return null;
         }
         final Attribute typeAttribute = XMLUtils.getRequiredAttribute(node.getElement(), "type");
-        final Class<? extends LivingEntity> entityClass = getEntity(typeAttribute.getValue());
+        final Class<? extends Entity> entityClass = getEntity(typeAttribute.getValue());
         if (entityClass == null) {
             throw new InvalidXMLException(
                 String.format("Unknown entity type '%s'", typeAttribute.getValue()),
@@ -42,7 +41,7 @@ public class EntityBuilder extends Builder<EntitySpecification, EntityBuilder> {
                 continue;
             }
             EntityAttributes.EntityAttributeDescription attributeData = EntityAttributes.INSTANCE.attributeData.get(
-                StringUtils.simplify(attribute.getName())
+                attribute.getName()
             );
             if (attributeData == null) {
                 throw new InvalidXMLException(
@@ -61,19 +60,23 @@ public class EntityBuilder extends Builder<EntitySpecification, EntityBuilder> {
                     node
                 );
             }
-            final Object attributeValue = attributeData.parser().apply(attribute.getValue());
-            attributeApplications.add(
-                new EntitySpecification.AttributeApplication(attributeValue, attributeData.function())
-            );
+            try {
+                final var attributeValue = attributeData.parser().apply(attribute.getValue());
+                attributeApplications.add(
+                    new EntitySpecification.AttributeApplication(attributeValue, attributeData.function())
+                );
+            } catch (RuntimeException e) {
+                throw new InvalidXMLException(node, e);
+            }
         }
 
         return new EntitySpecification(entityClass, attributeApplications);
     }
 
-    private Class<? extends LivingEntity> getEntity(final String entityName) {
+    private Class<? extends Entity> getEntity(final String entityName) {
         // todo: this is temporary, to be changed to lookup in entity registry
         try {
-            return (Class<? extends LivingEntity>) Class.forName("org.bukkit.entity." + entityName);
+            return (Class<? extends Entity>) Class.forName("org.bukkit.entity." + entityName);
         } catch (final ClassNotFoundException e) {
             return null;
         }

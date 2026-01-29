@@ -316,4 +316,18 @@ public class SpNMSHacks implements NMSHacks {
   public void simulateProjectileHit(Projectile projectile, Entity target) {
     throw new RuntimeException("simulateProjectileHit is not supported in this version");
   }
+
+  @Override
+  public void setFallingBlockType(Entity fallingBlock, BlockMaterialData blockMaterialData) {
+    throw new RuntimeException("setFallingBlockType is not supported in this version");
+  }
+
+  @Override
+  public void setNoGravity(Entity entity, boolean noGravity) {
+    net.minecraft.server.v1_8_R3.Entity nmsEntity = ((CraftEntity) entity).getHandle();
+    NBTTagCompound tag = new NBTTagCompound();
+    nmsEntity.c(tag); // save to tag
+    tag.setBoolean("NoGravity", true);
+    nmsEntity.f(tag); // load from tag
+  }
 }
