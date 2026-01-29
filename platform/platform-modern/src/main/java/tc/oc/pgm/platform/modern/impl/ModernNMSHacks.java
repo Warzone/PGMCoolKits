@@ -63,6 +63,7 @@ import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.AbstractProjectile;
 import org.bukkit.craftbukkit.entity.CraftEntity;
+import org.bukkit.craftbukkit.entity.CraftFallingBlock;
 import org.bukkit.craftbukkit.entity.CraftFirework;
 import org.bukkit.craftbukkit.generator.CraftWorldInfo;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
@@ -555,5 +556,12 @@ public class ModernNMSHacks implements NMSHacks {
     @Override
     public void setNoGravity(Entity entity, boolean noGravity) {
         entity.setGravity(!noGravity);
+    }
+
+    @Override
+    public void setFallingBlockAutoExpire(Entity fallingBlock, boolean autoExpire) {
+        if (fallingBlock instanceof FallingBlock) {
+            ((CraftFallingBlock) fallingBlock).getHandle().autoExpire = autoExpire;
+        }
     }
 }

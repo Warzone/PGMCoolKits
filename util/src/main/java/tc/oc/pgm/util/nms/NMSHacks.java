@@ -75,4 +75,6 @@ public interface NMSHacks {
   void setFallingBlockType(Entity fallingBlock, BlockMaterialData blockMaterialData);
 
   void setNoGravity(Entity entity, boolean noGravity);
+
+  void setFallingBlockAutoExpire(Entity fallingBlock, boolean autoExpire);
 }

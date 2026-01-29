@@ -43,6 +43,12 @@ public class EntityAttributes {
             Entity.class,
             (entity, noGravity) -> NMS_HACKS.setNoGravity(entity, (boolean) noGravity)
         );
+        addAttributeFunction(
+            attributeFunctions,
+            "autoExpire", Boolean::parseBoolean,
+            FallingBlock.class,
+            (entity, autoExpire) -> NMS_HACKS.setFallingBlockAutoExpire(entity, (boolean) autoExpire)
+        );
 
         INSTANCE = new EntityAttributes(attributeFunctions);
     }

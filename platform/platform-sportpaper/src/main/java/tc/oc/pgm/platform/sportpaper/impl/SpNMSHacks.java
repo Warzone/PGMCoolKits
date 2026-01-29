@@ -330,4 +330,9 @@ public class SpNMSHacks implements NMSHacks {
     tag.setBoolean("NoGravity", true);
     nmsEntity.f(tag); // load from tag
   }
+
+  @Override
+  public void setFallingBlockAutoExpire(Entity fallingBlock, boolean autoExpire) {
+    throw new RuntimeException("setFallingBlockAutoExpire is not supported in this version");
+  }
 }
