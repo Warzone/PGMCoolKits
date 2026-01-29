@@ -8,16 +8,25 @@ import tc.oc.pgm.kits.AbstractKit;
 
 public class DoubleJumpKit extends AbstractKit {
   public static final float DEFAULT_POWER = 3f; // mainly for backward compatibility
+  public static final float DEFAULT_BASE_LIFT = 0.75f;
+  public static final float DEFAULT_HEIGHT_SCALE = 0.50f;
   public static final Duration DEFAULT_RECHARGE = Duration.ofMillis(2500);
 
   protected final boolean enabled;
   protected final float power; // 1 power is roughly a normal vanilla jump
+  protected final float baseLift; // minimum Y lift
+  protected final float heightScale; // minimum Y lift
   protected final Duration rechargeTime;
   protected final boolean rechargeInAir;
 
-  public DoubleJumpKit(boolean enabled, float power, Duration rechargeTime, boolean rechargeInAir) {
+  public DoubleJumpKit(
+      boolean enabled, float power, float baseLift, float heightScale,
+      Duration rechargeTime, boolean rechargeInAir
+  ) {
     this.enabled = enabled;
     this.power = power;
+    this.baseLift = baseLift;
+    this.heightScale = heightScale;
     this.rechargeTime = rechargeTime;
     this.rechargeInAir = rechargeInAir;
   }

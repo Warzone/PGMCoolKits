@@ -748,12 +748,16 @@ public abstract class KitParser {
       boolean enabled = XMLUtils.parseBoolean(child.getAttribute("enabled"), true);
       float power = XMLUtils.parseNumber(
           child.getAttribute("power"), Float.class, DoubleJumpKit.DEFAULT_POWER);
+      float baseLift = XMLUtils.parseNumber(
+          child.getAttribute("base-lift"), Float.class, DoubleJumpKit.DEFAULT_BASE_LIFT);
+      float heightScale = XMLUtils.parseNumber(
+          child.getAttribute("height-scale"), Float.class, DoubleJumpKit.DEFAULT_BASE_LIFT);
       Duration rechargeTime = XMLUtils.parseDuration(
           child.getAttribute("recharge-time"), DoubleJumpKit.DEFAULT_RECHARGE);
       boolean rechargeInAir =
           XMLUtils.parseBoolean(child.getAttribute("recharge-before-landing"), false);
 
-      return new DoubleJumpKit(enabled, power, rechargeTime, rechargeInAir);
+      return new DoubleJumpKit(enabled, power, baseLift, heightScale, rechargeTime, rechargeInAir);
     } else {
       return null;
     }

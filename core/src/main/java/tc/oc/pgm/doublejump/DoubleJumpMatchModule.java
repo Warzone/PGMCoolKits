@@ -104,7 +104,7 @@ public class DoubleJumpMatchModule implements MatchModule, Listener, Tickable {
       // calculate jump
       Vector impulse = player.getLocation().getDirection();
 
-      impulse.setY(0.75 + Math.abs(impulse.getY()) * 0.5);
+      impulse.setY(jumper.kit.baseLift + Math.abs(impulse.getY()) * jumper.kit.heightScale);
       impulse.multiply(jumper.kit.power / 3f);
       player.setVelocity(impulse);
       Sounds.play(player, Sounds.DOUBLE_JUMP);
