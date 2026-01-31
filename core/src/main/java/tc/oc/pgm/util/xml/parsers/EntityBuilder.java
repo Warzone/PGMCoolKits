@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 public class EntityBuilder extends Builder<EntitySpecification, EntityBuilder> {
-    private static final Set<String> RESERVED_ATTRIBUTES = Set.of("type");
+    private static final Set<String> RESERVED_ATTRIBUTES = Set.of("type", "show-nametag");
 
     public EntityBuilder(@Nullable Element el, String... prop) {
         super(el, prop);

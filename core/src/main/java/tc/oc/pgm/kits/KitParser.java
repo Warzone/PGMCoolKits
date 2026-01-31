@@ -768,7 +768,8 @@ public abstract class KitParser {
 
     if (child != null) {
       EntitySpecification entitySpec = factory.getParser().entity(child).required();
-      return new DisguiseKit(entitySpec);
+      boolean showNametag = XMLUtils.parseBoolean(child.getAttribute("show-nametag"), true);
+      return new DisguiseKit(entitySpec, showNametag);
     } else {
       return null;
     }

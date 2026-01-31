@@ -28,20 +28,24 @@ import static tc.oc.pgm.util.nms.NMSHacks.NMS_HACKS;
 public class PlayerDisguise implements Listener {
     private final Player player;
     private final EntitySpecification entitySpec;
+    private final boolean showNametag;
     private final ScheduledExecutorService scheduledExecutorService;
     private final Plugin plugin;
+    private final Match match;
 
     private Future<?> tickFuture;
     private Entity disguise;
 
     public PlayerDisguise(
-        Player player, EntitySpecification entitySpec,
+        Player player, EntitySpecification entitySpec, boolean showNametag,
         Plugin plugin, ScheduledExecutorService scheduledExecutorService
     ) {
         this.player = player;
         this.entitySpec = entitySpec;
         this.plugin = plugin;
         this.scheduledExecutorService = scheduledExecutorService;
+        this.showNametag = showNametag;
+        this.match = PGM.get().getMatchManager().getMatch(player);
     }
 
     public void enable() {
@@ -51,6 +55,12 @@ public class PlayerDisguise implements Listener {
         Entity entity = entitySpec.spawn(player.getWorld(), player.getLocation());
         NMS_HACKS.setEntityAi(entity, false);
         NMS_HACKS.hideEntityForPlayer(PGM.get(), player, entity);
+        if (showNametag) {
+            MatchPlayer matchPlayer = match.getPlayer(player);
+            String teamColor = matchPlayer.getParty().getColor().toString();
+            entity.setCustomName(teamColor + player.getName());
+            entity.setCustomNameVisible(true);
+        }
 
         double targetHeight =  NMS_HACKS.getEntityHeight(entity);
         double playerBaseHeight = 1.8;
@@ -139,8 +149,7 @@ public class PlayerDisguise implements Listener {
         if (!(entity instanceof Player damager)) {
             return false;
         }
-        
-        Match match = PGM.get().getMatchManager().getMatch(player);
+
         MatchPlayer mpDamager = match.getPlayer(damager);
         MatchPlayer mpVictim = match.getPlayer(player);
 
