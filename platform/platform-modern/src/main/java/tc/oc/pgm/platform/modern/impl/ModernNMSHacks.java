@@ -57,6 +57,7 @@ import org.bukkit.Material;
 import org.bukkit.Nameable;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.CraftChunk;
 import org.bukkit.craftbukkit.CraftServer;
@@ -65,6 +66,7 @@ import org.bukkit.craftbukkit.entity.AbstractProjectile;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.entity.CraftFallingBlock;
 import org.bukkit.craftbukkit.entity.CraftFirework;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.generator.CraftWorldInfo;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.bukkit.entity.Entity;
@@ -73,6 +75,7 @@ import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.world.WorldLoadEvent;
@@ -563,5 +566,30 @@ public class ModernNMSHacks implements NMSHacks {
         if (fallingBlock instanceof FallingBlock) {
             ((CraftFallingBlock) fallingBlock).getHandle().autoExpire = autoExpire;
         }
+    }
+
+    @Override
+    public void setPlayerScale(Player player, double scale) {
+        player.getAttribute(Attribute.SCALE).setBaseValue(scale);
+    }
+
+    @Override
+    public double getEntityHeight(Entity entity) {
+        return entity.getHeight();
+    }
+
+    @Override
+    public boolean isPlayerInWall(Player player) {
+        return ((CraftPlayer) player).getHandle().isInWall();
+    }
+
+    @Override
+    public Entity getHitEntity(ProjectileHitEvent event) {
+        return event.getHitEntity();
+    }
+
+    @Override
+    public void cancelProjectileHitEvent(ProjectileHitEvent event) {
+        event.setCancelled(true);
     }
 }

@@ -14,6 +14,7 @@ import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -77,4 +78,14 @@ public interface NMSHacks {
   void setNoGravity(Entity entity, boolean noGravity);
 
   void setFallingBlockAutoExpire(Entity fallingBlock, boolean autoExpire);
+
+  void setPlayerScale(Player player, double scale);
+
+  double getEntityHeight(Entity entity);
+
+  boolean isPlayerInWall(Player player);
+
+  Entity getHitEntity(ProjectileHitEvent event);
+
+  void cancelProjectileHitEvent(ProjectileHitEvent event);
 }

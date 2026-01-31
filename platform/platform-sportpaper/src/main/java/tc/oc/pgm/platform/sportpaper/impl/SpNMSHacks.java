@@ -38,6 +38,7 @@ import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
@@ -334,5 +335,30 @@ public class SpNMSHacks implements NMSHacks {
   @Override
   public void setFallingBlockAutoExpire(Entity fallingBlock, boolean autoExpire) {
     throw new RuntimeException("setFallingBlockAutoExpire is not supported in this version");
+  }
+
+  @Override
+  public void setPlayerScale(Player player, double scale) {
+    throw new RuntimeException("setPlayerScale is not supported in this version");
+  }
+
+  @Override
+  public double getEntityHeight(Entity entity) {
+    throw new RuntimeException("getEntityHeight is not supported in this version");
+  }
+
+  @Override
+  public boolean isPlayerInWall(Player player) {
+    throw new RuntimeException("isPlayerInWall is not supported in this version");
+  }
+
+  @Override
+  public Entity getHitEntity(ProjectileHitEvent event) {
+    throw new RuntimeException("getHitEntity is not supported in this version");
+  }
+
+  @Override
+  public void cancelProjectileHitEvent(ProjectileHitEvent event) {
+    throw new RuntimeException("cancelProjectileHitEvent is not supported in this version");
   }
 }

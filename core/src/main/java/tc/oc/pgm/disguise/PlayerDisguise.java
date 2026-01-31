@@ -10,8 +10,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scoreboard.Team;
+
 import tc.oc.pgm.api.PGM;
+import tc.oc.pgm.api.match.Match;
+import tc.oc.pgm.api.player.MatchPlayer;
 import tc.oc.pgm.util.entity.EntitySpecification;
 
 import java.util.concurrent.Future;
@@ -46,7 +51,15 @@ public class PlayerDisguise implements Listener {
         Entity entity = entitySpec.spawn(player.getWorld(), player.getLocation());
         NMS_HACKS.setEntityAi(entity, false);
         NMS_HACKS.hideEntityForPlayer(PGM.get(), player, entity);
+
+        double targetHeight =  NMS_HACKS.getEntityHeight(entity);
+        double playerBaseHeight = 1.8;
+        double scaleValue = targetHeight / playerBaseHeight;
+        NMS_HACKS.setPlayerScale(player, scaleValue);
         disguise = entity;
+        Team team = player.getScoreboard().getEntryTeam(player.getName());
+        team.addEntry(disguise.getUniqueId().toString());
+
         tickFuture = scheduledExecutorService.scheduleAtFixedRate(this::tick, 0L, 50L, TimeUnit.MILLISECONDS);
     }
 
@@ -54,6 +67,9 @@ public class PlayerDisguise implements Listener {
         if (disguise == null) return;
         HandlerList.unregisterAll(this);
         disguise.remove();
+        NMS_HACKS.setPlayerScale(player, 1);
+        Team team = player.getScoreboard().getEntryTeam(player.getName());
+        team.removeEntry(disguise.getUniqueId().toString());
         disguise = null;
         tickFuture.cancel(true);
         tickFuture = null;
@@ -67,19 +83,36 @@ public class PlayerDisguise implements Listener {
     @EventHandler
     public void onDamage(final EntityDamageByEntityEvent event) {
         if (!event.getEntity().equals(disguise)) return;
+        if (isTeammate(event.getDamager())) {
+            event.setCancelled(true);
+            return;
+        }
         propagateDamage(event.getDamager(), event.getFinalDamage(), event);
     }
 
     @EventHandler
     public void onOtherDamage(final EntityDamageEvent event) {
         if (!event.getEntity().equals(disguise) || event instanceof EntityDamageByEntityEvent) return;
-        propagateDamage(null, event.getFinalDamage(), event);
+        if (NMS_HACKS.isPlayerInWall(player)) {
+            event.setDamage(0);
+        } else {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler
     public void onEntityByBlockDamage(final EntityDamageByBlockEvent event) {
         if (!event.getEntity().equals(disguise)) return;
         propagateDamage(null, event.getFinalDamage(), event);
+    }
+
+    @EventHandler
+    public void onProjectileHit(final ProjectileHitEvent event) {
+        Entity hitEntity = NMS_HACKS.getHitEntity(event);
+        if (!hitEntity.equals(disguise)) return;
+        if (isTeammate(event.getEntity())) {
+            NMS_HACKS.cancelProjectileHitEvent(event);
+        }
     }
 
     private void propagateDamage(Entity damager, double damage, EntityDamageEvent event) {
@@ -96,5 +129,21 @@ public class PlayerDisguise implements Listener {
             player.damage(damage);
         }
         event.setDamage(0);
+    }
+
+    private boolean isTeammate(Entity entity) {
+        if (entity instanceof Projectile projectile && projectile.getShooter() instanceof Player) {
+            entity = (Player) projectile.getShooter();
+        }
+
+        if (!(entity instanceof Player damager)) {
+            return false;
+        }
+        
+        Match match = PGM.get().getMatchManager().getMatch(player);
+        MatchPlayer mpDamager = match.getPlayer(damager);
+        MatchPlayer mpVictim = match.getPlayer(player);
+
+        return (mpVictim.getParty() == mpDamager.getParty());
     }
 }
