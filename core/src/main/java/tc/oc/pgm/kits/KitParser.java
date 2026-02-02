@@ -1,10 +1,5 @@
 package tc.oc.pgm.kits;
 
-import static tc.oc.pgm.util.attribute.AttributeUtils.ATTRIBUTE_UTILS;
-import static tc.oc.pgm.util.inventory.InventoryUtils.INVENTORY_UTILS;
-import static tc.oc.pgm.util.material.ColorUtils.COLOR_UTILS;
-import static tc.oc.pgm.util.nms.NMSHacks.NMS_HACKS;
-
 import com.google.common.base.Splitter;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
@@ -13,18 +8,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
 import com.google.common.collect.SetMultimap;
-import java.time.Duration;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.regex.Pattern;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.FireworkEffect;
@@ -77,6 +60,24 @@ import tc.oc.pgm.util.xml.InheritingElement;
 import tc.oc.pgm.util.xml.InvalidXMLException;
 import tc.oc.pgm.util.xml.Node;
 import tc.oc.pgm.util.xml.XMLUtils;
+
+import java.time.Duration;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.regex.Pattern;
+
+import static tc.oc.pgm.util.attribute.AttributeUtils.ATTRIBUTE_UTILS;
+import static tc.oc.pgm.util.inventory.InventoryUtils.INVENTORY_UTILS;
+import static tc.oc.pgm.util.material.ColorUtils.COLOR_UTILS;
+import static tc.oc.pgm.util.nms.NMSHacks.NMS_HACKS;
 
 public abstract class KitParser {
   private static final Set<String> ITEM_TYPES =
@@ -768,8 +769,7 @@ public abstract class KitParser {
 
     if (child != null) {
       EntitySpecification entitySpec = factory.getParser().entity(child).required();
-      boolean showNametag = XMLUtils.parseBoolean(child.getAttribute("show-nametag"), true);
-      return new DisguiseKit(entitySpec, showNametag);
+      return new DisguiseKit(entitySpec);
     } else {
       return null;
     }

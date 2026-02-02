@@ -43,12 +43,12 @@ public class DisguiseMatchModule implements MatchModule, Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerReset(PlayerResetEvent event) {
-        this.setDisguise(event.getPlayer().getBukkit(), null, false);
+        this.setDisguise(event.getPlayer().getBukkit(), null);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerDeath(PlayerDeathEvent event) {
-        this.setDisguise(event.getEntity(), null, false);
+        this.setDisguise(event.getEntity(), null);
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -72,10 +72,10 @@ public class DisguiseMatchModule implements MatchModule, Listener {
         }
     }
 
-    public void setDisguise(Player player, @Nullable EntitySpecification entitySpec, boolean showNametag) {
+    public void setDisguise(Player player, @Nullable EntitySpecification entitySpec) {
         if (entitySpec != null) {
             PlayerDisguise disguisedPlayer = new PlayerDisguise(
-                player, entitySpec, showNametag, PGM.get(),  match.getExecutor(MatchScope.LOADED)
+                player, entitySpec, PGM.get(), match.getExecutor(MatchScope.LOADED)
             );
             disguisedPlayer.enable();
             this.playerDisguises.put(player, disguisedPlayer);

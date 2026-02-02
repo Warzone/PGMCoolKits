@@ -1,7 +1,6 @@
 package tc.oc.pgm.disguise;
 
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -12,7 +11,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.plugin.Plugin;
-
 import tc.oc.pgm.api.PGM;
 import tc.oc.pgm.api.match.Match;
 import tc.oc.pgm.api.player.MatchPlayer;
@@ -27,23 +25,21 @@ import static tc.oc.pgm.util.nms.NMSHacks.NMS_HACKS;
 public class PlayerDisguise implements Listener {
     private final Player player;
     private final EntitySpecification entitySpec;
-    private final boolean showNametag;
     private final ScheduledExecutorService scheduledExecutorService;
     private final Plugin plugin;
     private final Match match;
 
     private Future<?> tickFuture;
-    private Entity disguise;
+    private DisguiseEntity disguise;
 
     public PlayerDisguise(
-        Player player, EntitySpecification entitySpec, boolean showNametag,
+        Player player, EntitySpecification entitySpec,
         Plugin plugin, ScheduledExecutorService scheduledExecutorService
     ) {
         this.player = player;
         this.entitySpec = entitySpec;
         this.plugin = plugin;
         this.scheduledExecutorService = scheduledExecutorService;
-        this.showNametag = showNametag;
         this.match = PGM.get().getMatchManager().getMatch(player);
     }
 
@@ -51,21 +47,11 @@ public class PlayerDisguise implements Listener {
         if (disguise != null) return;
 
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        Entity entity = entitySpec.spawn(player.getWorld(), player.getLocation());
-        NMS_HACKS.setEntityAi(entity, false);
-        NMS_HACKS.hideEntityForPlayer(PGM.get(), player, entity);
-        if (showNametag) {
-            MatchPlayer matchPlayer = match.getPlayer(player);
-            String teamColor = matchPlayer.getParty().getColor().toString();
-            entity.setCustomName(teamColor + player.getName());
-            entity.setCustomNameVisible(true);
-        }
-
-        double targetHeight =  NMS_HACKS.getEntityHeight(entity);
-        double playerBaseHeight = 1.8;
-        double scaleValue = targetHeight / playerBaseHeight;
-        NMS_HACKS.setPlayerScale(player, scaleValue);
-        disguise = entity;
+        var disguiseEntity = DisguiseEntity.Factory.spawnFromSpecification(
+            entitySpec, player.getWorld(), player.getLocation()
+        );
+        disguiseEntity.init(match, player);
+        disguise = disguiseEntity;
 
         tickFuture = scheduledExecutorService.scheduleAtFixedRate(this::tick, 0L, 50L, TimeUnit.MILLISECONDS);
     }
@@ -73,8 +59,7 @@ public class PlayerDisguise implements Listener {
     public void disable() {
         if (disguise == null) return;
         HandlerList.unregisterAll(this);
-        disguise.remove();
-        NMS_HACKS.setPlayerScale(player, 1);
+        disguise.unload(player);
         disguise = null;
         tickFuture.cancel(true);
         tickFuture = null;
@@ -82,12 +67,13 @@ public class PlayerDisguise implements Listener {
 
     private void tick() {
         if (disguise == null) return;
-        disguise.teleport(player);
+        disguise.syncPos(player);
     }
 
     @EventHandler
     public void onDamage(final EntityDamageByEntityEvent event) {
-        if (!event.getEntity().equals(disguise)) return;
+        if (disguise == null) return;
+        if (!event.getEntity().equals(disguise.getPhysicsEntity())) return;
         if (isTeammate(event.getDamager())) {
             event.setCancelled(true);
             return;
@@ -97,7 +83,8 @@ public class PlayerDisguise implements Listener {
 
     @EventHandler
     public void onOtherDamage(final EntityDamageEvent event) {
-        if (!event.getEntity().equals(disguise) || event instanceof EntityDamageByEntityEvent) return;
+        if (disguise == null) return;
+        if (!event.getEntity().equals(disguise.getPhysicsEntity()) || event instanceof EntityDamageByEntityEvent) return;
         if (NMS_HACKS.isPlayerInWall(player)) {
             event.setDamage(0);
         } else {
@@ -107,23 +94,25 @@ public class PlayerDisguise implements Listener {
 
     @EventHandler
     public void onEntityByBlockDamage(final EntityDamageByBlockEvent event) {
-        if (!event.getEntity().equals(disguise)) return;
+        if (disguise == null) return;
+        if (!event.getEntity().equals(disguise.getPhysicsEntity())) return;
         propagateDamage(null, event.getFinalDamage(), event);
     }
 
     @EventHandler
     public void onProjectileHit(final ProjectileHitEvent event) {
         Entity hitEntity = NMS_HACKS.getHitEntity(event);
-        if (!hitEntity.equals(disguise)) return;
+        if (hitEntity == null) {
+            return;
+        }
+        if (!hitEntity.equals(disguise.getPhysicsEntity())) return;
         if (isTeammate(event.getEntity())) {
             NMS_HACKS.cancelProjectileHitEvent(event);
         }
     }
 
     private void propagateDamage(Entity damager, double damage, EntityDamageEvent event) {
-        if (disguise instanceof LivingEntity livingDisguise) {
-            livingDisguise.resetMaxHealth();
-        }
+        disguise.postDamageHandler();
         if (damager != null) {
             if (damager instanceof Projectile projectile) {
                 NMS_HACKS.simulateProjectileHit(projectile, player);

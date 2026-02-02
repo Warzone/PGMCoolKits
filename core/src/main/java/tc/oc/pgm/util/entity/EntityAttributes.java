@@ -24,6 +24,8 @@ public class EntityAttributes {
 
     static {
         final Map<String, EntityAttributeDescription> attributeFunctions = new HashMap<>();
+        var blockDisplayClass = NMS_HACKS.getEntityTypes().getBlockDisplayEntityType();
+
         addAttributeFunction(
             attributeFunctions,
             "charged", Boolean::parseBoolean,
@@ -31,14 +33,24 @@ public class EntityAttributes {
             (creeper, charged) -> ((Creeper) creeper).setPowered((boolean) charged),
             false
         );
-        addAttributeFunction(
-            attributeFunctions,
-            "blockType", (s) -> Material.valueOf(s.replace(" ", "_").toUpperCase()),
-            FallingBlock.class,
-            (fallingBlock, blockMaterial) ->
-                NMS_HACKS.setFallingBlockType(fallingBlock, MaterialData.block((Material) blockMaterial)),
-            Material.STONE
-        );
+        if (blockDisplayClass != null) {
+            addAttributeFunction(
+                attributeFunctions,
+                "block", (s) -> Material.valueOf(s.replace(" ", "_").toUpperCase()),
+                blockDisplayClass,
+                (blockDisplay, blockMaterial) ->
+                    NMS_HACKS.asBlockDisplay(blockDisplay).setBlock((Material) blockMaterial),
+                Material.STONE
+            );
+            addAttributeFunction(
+                attributeFunctions,
+                "teleportation-duration", Integer::parseInt,
+                blockDisplayClass,
+                (blockDisplay, teleportationDuration) ->
+                    NMS_HACKS.asBlockDisplay(blockDisplay).setTeleportationDuration((int) teleportationDuration),
+                null
+            );
+        }
         addAttributeFunction(
             attributeFunctions,
             "noGravity", Boolean::parseBoolean,
