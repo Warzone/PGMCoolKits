@@ -5,6 +5,7 @@ import org.jdom2.Attribute;
 import org.jdom2.Element;
 import org.jetbrains.annotations.Nullable;
 import tc.oc.pgm.util.entity.EntityAttributes;
+import tc.oc.pgm.util.entity.EntityAttributes.EntityAttributeDescription;
 import tc.oc.pgm.util.entity.EntitySpecification;
 import tc.oc.pgm.util.xml.InvalidXMLException;
 import tc.oc.pgm.util.xml.Node;
@@ -36,6 +37,14 @@ public class EntityBuilder extends Builder<EntitySpecification, EntityBuilder> {
         }
 
         final List<EntitySpecification.AttributeApplication> attributeApplications = new ArrayList<>();
+        for (EntityAttributeDescription attributeData : EntityAttributes.INSTANCE.attributeData.values()) {
+            if (!attributeData.classRequired().isAssignableFrom(entityClass)) {
+                continue;
+            }
+            attributeApplications.add(
+                new EntitySpecification.AttributeApplication(attributeData.defaultValue(), attributeData.function())
+            );
+        }
         for (final Attribute attribute : node.getElement().getAttributes()) {
             if (RESERVED_ATTRIBUTES.contains(attribute.getName())) {
                 continue;
@@ -73,6 +82,7 @@ public class EntityBuilder extends Builder<EntitySpecification, EntityBuilder> {
         return new EntitySpecification(entityClass, attributeApplications);
     }
 
+    @SuppressWarnings("unchecked")
     private Class<? extends Entity> getEntity(final String entityName) {
         // todo: this is temporary, to be changed to lookup in entity registry
         try {

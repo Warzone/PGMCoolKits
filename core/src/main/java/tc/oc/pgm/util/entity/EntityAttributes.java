@@ -28,26 +28,30 @@ public class EntityAttributes {
             attributeFunctions,
             "charged", Boolean::parseBoolean,
             Creeper.class,
-            (creeper, charged) -> ((Creeper) creeper).setPowered((boolean) charged)
+            (creeper, charged) -> ((Creeper) creeper).setPowered((boolean) charged),
+            false
         );
         addAttributeFunction(
             attributeFunctions,
             "blockType", (s) -> Material.valueOf(s.replace(" ", "_").toUpperCase()),
             FallingBlock.class,
             (fallingBlock, blockMaterial) ->
-                NMS_HACKS.setFallingBlockType(fallingBlock, MaterialData.block((Material) blockMaterial))
+                NMS_HACKS.setFallingBlockType(fallingBlock, MaterialData.block((Material) blockMaterial)),
+            Material.STONE
         );
         addAttributeFunction(
             attributeFunctions,
             "noGravity", Boolean::parseBoolean,
             Entity.class,
-            (entity, noGravity) -> NMS_HACKS.setNoGravity(entity, (boolean) noGravity)
+            (entity, noGravity) -> NMS_HACKS.setNoGravity(entity, (boolean) noGravity),
+            false
         );
         addAttributeFunction(
             attributeFunctions,
             "autoExpire", Boolean::parseBoolean,
             FallingBlock.class,
-            (entity, autoExpire) -> NMS_HACKS.setFallingBlockAutoExpire(entity, (boolean) autoExpire)
+            (entity, autoExpire) -> NMS_HACKS.setFallingBlockAutoExpire(entity, (boolean) autoExpire),
+            true
         );
 
         INSTANCE = new EntityAttributes(attributeFunctions);
@@ -57,17 +61,19 @@ public class EntityAttributes {
         final Map<String, EntityAttributeDescription> attributeFunctions,
         final String key, final Function<String, Object> parser,
         final Class<? extends Entity> classRequired,
-        final BiConsumer<Entity, Object> function
+        final BiConsumer<Entity, Object> function,
+        final Object defaultValue
     ) {
         if (attributeFunctions.containsKey(key)) {
             throw new RuntimeException("Duplicate entity attribute '" + key + "', this must be unique");
         }
-        attributeFunctions.put(key, new EntityAttributeDescription(classRequired, parser, function));
+        attributeFunctions.put(key, new EntityAttributeDescription(classRequired, parser, function, defaultValue));
     }
 
     public record EntityAttributeDescription(
         Class<? extends Entity> classRequired,
         Function<String, Object> parser,
-        BiConsumer<Entity, Object> function
+        BiConsumer<Entity, Object> function,
+        Object defaultValue
     ) { }
 }
