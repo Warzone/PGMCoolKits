@@ -12,7 +12,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scoreboard.Team;
 
 import tc.oc.pgm.api.PGM;
 import tc.oc.pgm.api.match.Match;
@@ -67,8 +66,6 @@ public class PlayerDisguise implements Listener {
         double scaleValue = targetHeight / playerBaseHeight;
         NMS_HACKS.setPlayerScale(player, scaleValue);
         disguise = entity;
-        Team team = player.getScoreboard().getEntryTeam(player.getName());
-        team.addEntry(disguise.getUniqueId().toString());
 
         tickFuture = scheduledExecutorService.scheduleAtFixedRate(this::tick, 0L, 50L, TimeUnit.MILLISECONDS);
     }
@@ -78,8 +75,6 @@ public class PlayerDisguise implements Listener {
         HandlerList.unregisterAll(this);
         disguise.remove();
         NMS_HACKS.setPlayerScale(player, 1);
-        Team team = player.getScoreboard().getEntryTeam(player.getName());
-        team.removeEntry(disguise.getUniqueId().toString());
         disguise = null;
         tickFuture.cancel(true);
         tickFuture = null;
