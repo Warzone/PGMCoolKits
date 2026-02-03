@@ -46,6 +46,8 @@ import tc.oc.pgm.api.feature.FeatureValidation;
 import tc.oc.pgm.api.filter.Filter;
 import tc.oc.pgm.api.filter.Filterables;
 import tc.oc.pgm.api.filter.query.PartyQuery;
+import tc.oc.pgm.api.filter.query.Query;
+import tc.oc.pgm.api.integration.Integration;
 import tc.oc.pgm.api.map.MapProtos;
 import tc.oc.pgm.api.map.factory.MapFactory;
 import tc.oc.pgm.api.party.Party;
@@ -513,5 +515,47 @@ public class ActionParser {
   public SummonAction parseSummon(Element el, Class<?> scope) throws InvalidXMLException {
     var entityType = parser.parseEnum(EntityType.class, el, "type").required();
     return new SummonAction(entityType);
+  }
+
+  @MethodParser("native")
+  public <B extends Filterable<?>> Action<? super B> parseNative(Element el, Class<B> scope)
+      throws InvalidXMLException {
+    var nativeId = parser.string(el, "id").required();
+    var nativeAction = Integration.getNativeActionLazy(nativeId, scope);
+    return new Action<B>() {
+      private Action<B> inner;
+
+      @Override
+      public Class<B> getScope() {
+        return getInner().getScope();
+      }
+
+      @Override
+      public void trigger(B b) {
+        getInner().trigger(b);
+      }
+
+      @Override
+      public void untrigger(B b) {
+        getInner().untrigger(b);
+      }
+
+      @Override
+      public void trigger(B b, Query event) {
+        getInner().trigger(b, event);
+      }
+
+      private Action<B> getInner() {
+        if (inner != null) {
+          return inner;
+        }
+        var action = nativeAction.get();
+        if (action == null) {
+          throw new RuntimeException(String.format("Native action '%s' did not exist", nativeId));
+        }
+        inner = action;
+        return action;
+      }
+    };
   }
 }

@@ -8,8 +8,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
+
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.Nullable;
+import tc.oc.pgm.action.Action;
 import tc.oc.pgm.api.channels.Channel;
 import tc.oc.pgm.api.player.MatchPlayer;
 
@@ -27,6 +30,8 @@ public final class Integration {
       new AtomicReference<>(new NoopVanishIntegration());
   private static final AtomicReference<SquadIntegration> SQUAD =
       new AtomicReference<>(new NoopSquadIntegration());
+  private static final AtomicReference<ActionIntegration> ACTION =
+      new AtomicReference<>(new NoopActionIntegration());
   private static Set<Channel<?>> CHANNELS = new HashSet<>();
 
   public static void setFriendIntegration(FriendIntegration integration) {
@@ -54,6 +59,10 @@ public final class Integration {
       throw new IllegalStateException(
           "New channels cannot be registered after ChatManager has been initialised!");
     CHANNELS.add(assertNotNull(channel));
+  }
+
+  public static void setActionIntegration(ActionIntegration integration) {
+    ACTION.set(assertNotNull(integration));
   }
 
   public static boolean isFriend(Player a, Player b) {
@@ -99,6 +108,10 @@ public final class Integration {
     Set<Channel<?>> channels = CHANNELS;
     CHANNELS = null;
     return Collections.unmodifiableSet(channels);
+  }
+
+  public static <T> Supplier<Action<T>> getNativeActionLazy(String id, Class<T> scope) {
+    return () -> ACTION.get().getNativeAction(id, scope);
   }
 
   // No-op Implementations
@@ -151,6 +164,13 @@ public final class Integration {
 
     @Override
     public Collection<UUID> getSquad(Player player) {
+      return null;
+    }
+  }
+
+  private static class NoopActionIntegration implements ActionIntegration {
+    @Override
+    public <T> Action<T> getNativeAction(String id, Class<T> scope) {
       return null;
     }
   }
