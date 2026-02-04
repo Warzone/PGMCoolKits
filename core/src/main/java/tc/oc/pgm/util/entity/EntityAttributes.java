@@ -4,7 +4,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
-import tc.oc.pgm.util.material.MaterialData;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,7 +38,8 @@ public class EntityAttributes {
                 "block", (s) -> Material.valueOf(s.replace(" ", "_").toUpperCase()),
                 blockDisplayClass,
                 (blockDisplay, blockMaterial) ->
-                    NMS_HACKS.asBlockDisplay(blockDisplay).setBlock((Material) blockMaterial),
+                    NMS_HACKS.getEntityTypes()
+                        .asBlockDisplay(blockDisplay).setBlock((Material) blockMaterial),
                 Material.STONE
             );
             addAttributeFunction(
@@ -47,7 +47,8 @@ public class EntityAttributes {
                 "teleportation-duration", Integer::parseInt,
                 blockDisplayClass,
                 (blockDisplay, teleportationDuration) ->
-                    NMS_HACKS.asBlockDisplay(blockDisplay).setTeleportationDuration((int) teleportationDuration),
+                    NMS_HACKS.getEntityTypes()
+                        .asBlockDisplay(blockDisplay).setTeleportationDuration((int) teleportationDuration),
                 null
             );
         }

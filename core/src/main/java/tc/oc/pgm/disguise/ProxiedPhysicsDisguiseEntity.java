@@ -1,6 +1,5 @@
 package tc.oc.pgm.disguise;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -10,8 +9,6 @@ import org.bukkit.potion.PotionEffectType;
 import tc.oc.pgm.api.PGM;
 import tc.oc.pgm.api.match.Match;
 import tc.oc.pgm.api.player.MatchPlayer;
-
-import java.util.ArrayList;
 
 import static tc.oc.pgm.util.nms.NMSHacks.NMS_HACKS;
 
@@ -47,7 +44,7 @@ public class ProxiedPhysicsDisguiseEntity implements DisguiseEntity {
             physics.setCustomNameVisible(true);
         }
         if (isBlockDisplay) {
-            NMS_HACKS.asBlockDisplay(model).setTransformationMatrix(
+            NMS_HACKS.getEntityTypes().asBlockDisplay(model).setTransformationMatrix(
                 -0.5f, 0.0f, -0.5f
             );
         }
@@ -76,9 +73,6 @@ public class ProxiedPhysicsDisguiseEntity implements DisguiseEntity {
 
     @Override
     public void postDamageHandler() {
-        NMS_HACKS.broadcastHurtAnimationForEntity(
-            physics, new ArrayList<>(Bukkit.getOnlinePlayers())
-        );
     }
 
     @Override

@@ -1,14 +1,10 @@
 package tc.oc.pgm.disguise;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.Team;
 import tc.oc.pgm.api.PGM;
 import tc.oc.pgm.api.match.Match;
 import tc.oc.pgm.api.player.MatchPlayer;
-
-import java.util.ArrayList;
 
 import static tc.oc.pgm.util.nms.NMSHacks.NMS_HACKS;
 
@@ -58,9 +54,6 @@ public class StandardDisguiseEntity implements DisguiseEntity {
 
     @Override
     public void postDamageHandler() {
-        NMS_HACKS.broadcastHurtAnimationForEntity(
-            disguise, new ArrayList<>(Bukkit.getOnlinePlayers())
-        );
     }
 
     @Override

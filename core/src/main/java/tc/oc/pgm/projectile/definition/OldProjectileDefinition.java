@@ -1,9 +1,5 @@
-package tc.oc.pgm.projectile;
+package tc.oc.pgm.projectile.definition;
 
-import java.time.Duration;
-import java.util.List;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.FallingBlock;
 import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.Nullable;
 import tc.oc.pgm.action.Action;
@@ -11,15 +7,18 @@ import tc.oc.pgm.api.filter.Filter;
 import tc.oc.pgm.api.location.MatchLocation;
 import tc.oc.pgm.api.player.MatchPlayer;
 import tc.oc.pgm.features.SelfIdentifyingFeatureDefinition;
+import tc.oc.pgm.projectile.ClickAction;
 import tc.oc.pgm.util.material.BlockMaterialData;
 
-public class ProjectileDefinition extends SelfIdentifyingFeatureDefinition {
+import java.time.Duration;
+import java.util.List;
+
+public class OldProjectileDefinition extends SelfIdentifyingFeatureDefinition {
   protected @Nullable String name;
   protected @Nullable Double damage;
   protected @Nullable Float power;
   protected double velocity;
   protected ClickAction clickAction;
-  protected ProjectileEntity projectile;
   protected List<PotionEffect> potion;
   protected Filter destroyFilter;
   protected Duration coolDown;
@@ -29,14 +28,13 @@ public class ProjectileDefinition extends SelfIdentifyingFeatureDefinition {
   protected final Action<? super MatchLocation> onHitBlockAction;
   protected final Action<? super MatchPlayer> onHitPlayerAction;
 
-  public ProjectileDefinition(
+  public OldProjectileDefinition(
       @Nullable String id,
       @Nullable String name,
       @Nullable Double damage,
       @Nullable Float power,
       double velocity,
       ClickAction clickAction,
-      ProjectileEntity entity,
       List<PotionEffect> potion,
       Filter destroyFilter,
       Duration coolDown,
@@ -51,7 +49,6 @@ public class ProjectileDefinition extends SelfIdentifyingFeatureDefinition {
     this.power = power;
     this.velocity = velocity;
     this.clickAction = clickAction;
-    this.projectile = entity;
     this.potion = potion;
     this.destroyFilter = destroyFilter;
     this.coolDown = coolDown;
@@ -60,25 +57,6 @@ public class ProjectileDefinition extends SelfIdentifyingFeatureDefinition {
     this.blockMaterial = blockMaterial;
     this.onHitBlockAction = onHitBlockAction;
     this.onHitPlayerAction = onHitPlayerAction;
-  }
-
-  public sealed interface ProjectileEntity permits RealEntity, BlockEntityType {
-    boolean requiresBlockMaterial();
-  }
-
-  record RealEntity(Class<? extends Entity> entityType) implements ProjectileEntity {
-    @Override
-    public boolean requiresBlockMaterial() {
-      return FallingBlock.class.isAssignableFrom(entityType);
-    }
-  }
-
-  record BlockEntityType(float size, boolean solidBlockCollision, Duration maxTravelTime)
-      implements ProjectileEntity {
-    @Override
-    public boolean requiresBlockMaterial() {
-      return true;
-    }
   }
 
   public @Nullable String getName() {

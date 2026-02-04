@@ -1,16 +1,5 @@
 package tc.oc.pgm.platform.sportpaper.impl;
 
-import static tc.oc.pgm.util.nms.Packets.ENTITIES;
-import static tc.oc.pgm.util.platform.Supports.Variant.SPORTPAPER;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.Collection;
-import java.util.function.Predicate;
-
 import net.minecraft.server.v1_8_R3.AxisAlignedBB;
 import net.minecraft.server.v1_8_R3.ChunkSection;
 import net.minecraft.server.v1_8_R3.EntityArrow;
@@ -24,7 +13,12 @@ import net.minecraft.server.v1_8_R3.ServerNBTManager;
 import net.minecraft.server.v1_8_R3.Vec3D;
 import net.minecraft.server.v1_8_R3.WorldData;
 import net.minecraft.server.v1_8_R3.WorldServer;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_8_R3.CraftChunk;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
@@ -47,8 +41,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
+import tc.oc.pgm.platform.sportpaper.SpEntityTypes;
 import tc.oc.pgm.util.chunk.NullChunkGenerator;
-import tc.oc.pgm.util.entity.BlockDisplayWrapper;
 import tc.oc.pgm.util.entity.EntityTypes;
 import tc.oc.pgm.util.entity.EntityWrapper;
 import tc.oc.pgm.util.material.BlockMaterialData;
@@ -56,6 +50,16 @@ import tc.oc.pgm.util.nms.NMSHacks;
 import tc.oc.pgm.util.platform.Supports;
 import tc.oc.pgm.util.reflect.ReflectionUtils;
 import tc.oc.pgm.util.skin.Skin;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.function.Predicate;
+
+import static tc.oc.pgm.util.nms.Packets.ENTITIES;
+import static tc.oc.pgm.util.platform.Supports.Variant.SPORTPAPER;
 
 @Supports(SPORTPAPER)
 public class SpNMSHacks implements NMSHacks {
@@ -247,7 +251,7 @@ public class SpNMSHacks implements NMSHacks {
   }
 
   @Override
-  public Location collidesWithBlock(Location center, double halfSize, Vector delta, int substeps, Vector substep) {
+  public Location raycastBlock(Location center, double halfSize, Vector delta, int substeps, Vector substep) {
     Location pos = center.clone();
     
     AxisAlignedBB AABB = new AxisAlignedBB(
@@ -283,7 +287,7 @@ public class SpNMSHacks implements NMSHacks {
   }
 
   @Override
-  public Entity collidesWithPlayer(Location center, double halfSize, Vector delta, Predicate<Entity> predicate) {
+  public Entity raycastEntity(Location center, double halfSize, Vector delta, Predicate<Entity> predicate) {
     Vector start = center.toVector();
     Vector end = start.clone().add(delta);
 
@@ -367,18 +371,8 @@ public class SpNMSHacks implements NMSHacks {
   }
 
   @Override
-  public void broadcastHurtAnimationForEntity(Entity entity, Collection<Player> players) {
-    throw new RuntimeException("broadcastHurtAnimationForEntity is not supported in this version");
-  }
-
-  @Override
   public EntityTypes getEntityTypes() {
-    throw new RuntimeException("getEntityTypes is not supported in this version");
-  }
-
-  @Override
-  public BlockDisplayWrapper asBlockDisplay(Entity entity) {
-    throw new RuntimeException("asBlockDisplay is not supported in this version");
+    return SpEntityTypes.INSTANCE;
   }
 
   @Override

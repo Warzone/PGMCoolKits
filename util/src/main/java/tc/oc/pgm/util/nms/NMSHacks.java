@@ -3,7 +3,6 @@ package tc.oc.pgm.util.nms;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Predicate;
-import java.util.Collection;
 
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -21,7 +20,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
-import tc.oc.pgm.util.entity.BlockDisplayWrapper;
 import tc.oc.pgm.util.entity.EntityTypes;
 import tc.oc.pgm.util.entity.EntityWrapper;
 import tc.oc.pgm.util.material.BlockMaterialData;
@@ -69,9 +67,9 @@ public interface NMSHacks {
 
   int allocateEntityId();
 
-  Location collidesWithBlock(Location center, double halfSize, Vector delta, int substeps, Vector substep);
+  Location raycastBlock(Location center, double halfSize, Vector delta, int substeps, Vector substep);
 
-  Entity collidesWithPlayer(Location center, double halfSize, Vector delta, Predicate<Entity> predicate);
+  Entity raycastEntity(Location center, double halfSize, Vector delta, Predicate<Entity> predicate);
 
   void hideEntityForPlayer(Plugin plugin, Player player, Entity entity);
 
@@ -93,11 +91,7 @@ public interface NMSHacks {
 
   void cancelProjectileHitEvent(ProjectileHitEvent event);
 
-  void broadcastHurtAnimationForEntity(Entity entity, Collection<Player> players);
-
   EntityTypes getEntityTypes();
-
-  BlockDisplayWrapper asBlockDisplay(Entity entity);
 
   EntityWrapper getEntityWrapper(Entity entity);
 }

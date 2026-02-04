@@ -1,13 +1,5 @@
 package tc.oc.pgm.projectile;
 
-import static tc.oc.pgm.util.text.TemporalComponent.ticker;
-
-import java.time.Duration;
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -15,9 +7,19 @@ import org.bukkit.scheduler.BukkitRunnable;
 import tc.oc.pgm.api.match.MatchScope;
 import tc.oc.pgm.api.player.MatchPlayer;
 import tc.oc.pgm.kits.tag.ItemTags;
+import tc.oc.pgm.projectile.definition.ProjectileDefinition;
 import tc.oc.pgm.util.TimeUtils;
 import tc.oc.pgm.util.inventory.InventoryUtils;
 import tc.oc.pgm.util.text.TextTranslations;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Objects;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
+import static tc.oc.pgm.util.text.TemporalComponent.ticker;
 
 public class ProjectileCooldowns {
 
@@ -55,7 +57,7 @@ public class ProjectileCooldowns {
     if (this.isActive(definition))
       throw new RuntimeException("cooldown started when already in progress");
 
-    cooldowns.put(definition, Instant.now().plus(definition.coolDown));
+    cooldowns.put(definition, Instant.now().plus(definition.getBaseDefinition().coolDown()));
 
     if (runnableTask != null && !this.runnableTask.isDone()) return;
 

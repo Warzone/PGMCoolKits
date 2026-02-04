@@ -6,17 +6,6 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.Lifecycle;
 import io.papermc.paper.world.PaperWorldLoader;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.OptionalLong;
-import java.util.UUID;
-import java.util.Collection;
-import java.util.function.Predicate;
-import java.util.logging.Level;
-
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
@@ -70,7 +59,6 @@ import org.bukkit.craftbukkit.entity.CraftFirework;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.generator.CraftWorldInfo;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
-import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Fireball;
@@ -91,17 +79,14 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
-
 import tc.oc.pgm.api.PGM;
 import tc.oc.pgm.platform.modern.PgmBootstrap;
-import tc.oc.pgm.platform.modern.entity.ModernBlockDisplay;
 import tc.oc.pgm.platform.modern.entity.ModernEntityTypes;
 import tc.oc.pgm.platform.modern.entity.ModernEntityWrapper;
 import tc.oc.pgm.platform.modern.material.ModernBlockMaterialData;
 import tc.oc.pgm.platform.modern.util.PGMServerLevel;
 import tc.oc.pgm.util.DataVersions;
 import tc.oc.pgm.util.chunk.NullChunkGenerator;
-import tc.oc.pgm.util.entity.BlockDisplayWrapper;
 import tc.oc.pgm.util.entity.EntityTypes;
 import tc.oc.pgm.util.entity.EntityWrapper;
 import tc.oc.pgm.util.material.BlockMaterialData;
@@ -110,8 +95,16 @@ import tc.oc.pgm.util.platform.Supports;
 import tc.oc.pgm.util.reflect.ReflectionUtils;
 import tc.oc.pgm.util.skin.Skin;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.OptionalLong;
+import java.util.UUID;
+import java.util.function.Predicate;
+import java.util.logging.Level;
 
 import static tc.oc.pgm.util.nms.Packets.ENTITIES;
 import static tc.oc.pgm.util.platform.Supports.Variant.PAPER;
@@ -500,7 +493,7 @@ public class ModernNMSHacks implements NMSHacks {
     );
 
     @Override
-    public Location collidesWithBlock(Location center, double halfSize, Vector delta, int substeps, Vector substep) {
+    public Location raycastBlock(Location center, double halfSize, Vector delta, int substeps, Vector substep) {
         Location pos = center.clone();
         AABB AABB = new AABB(
         pos.getX() - halfSize + Math.min(0, delta.getX()),
@@ -535,7 +528,7 @@ public class ModernNMSHacks implements NMSHacks {
     }
 
     @Override
-    public Entity collidesWithPlayer(Location center, double halfSize, Vector delta, Predicate<Entity> predicate) {
+    public Entity raycastEntity(Location center, double halfSize, Vector delta, Predicate<Entity> predicate) {
         RayTraceResult result = center.getWorld().rayTraceEntities(center, delta.normalize(), delta.length(), halfSize, predicate);
         return result != null ? result.getHitEntity() : null;
     }
@@ -602,18 +595,8 @@ public class ModernNMSHacks implements NMSHacks {
     }
 
     @Override
-    public void broadcastHurtAnimationForEntity(Entity entity, Collection<Player> players) {
-        entity.broadcastHurtAnimation(players);
-    }
-
-    @Override
     public EntityTypes getEntityTypes() {
         return ModernEntityTypes.INSTANCE;
-    }
-
-    @Override
-    public BlockDisplayWrapper asBlockDisplay(Entity entity) {
-        return new ModernBlockDisplay((BlockDisplay) entity);
     }
 
     @Override

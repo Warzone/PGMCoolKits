@@ -9,8 +9,8 @@ import org.bukkit.projectiles.ProjectileSource;
 import tc.oc.pgm.api.match.Match;
 import tc.oc.pgm.api.tracker.info.PhysicalInfo;
 import tc.oc.pgm.projectile.EntityLaunchEvent;
-import tc.oc.pgm.projectile.ProjectileDefinition;
 import tc.oc.pgm.projectile.ProjectileMatchModule;
+import tc.oc.pgm.projectile.definition.ProjectileDefinition;
 import tc.oc.pgm.tracker.TrackerMatchModule;
 import tc.oc.pgm.tracker.info.ProjectileInfo;
 
@@ -42,7 +42,7 @@ public class ProjectileTracker extends AbstractTracker<ProjectileInfo> {
     if (!(projectileInfo instanceof ProjectileInfo)
         || (((ProjectileInfo) projectileInfo).getShooter() == null && source != null)) {
       ProjectileDefinition definition = ProjectileMatchModule.getProjectileDefinition(projectile);
-      String customName = definition == null ? null : definition.getName();
+      String customName = definition == null ? null : definition.getBaseDefinition().name();
       entities()
           .trackEntity(
               projectile,

@@ -42,7 +42,7 @@ import tc.oc.pgm.filters.matcher.StaticFilter;
 import tc.oc.pgm.kits.tag.Grenade;
 import tc.oc.pgm.kits.tag.ItemModifier;
 import tc.oc.pgm.kits.tag.ItemTags;
-import tc.oc.pgm.projectile.ProjectileDefinition;
+import tc.oc.pgm.projectile.definition.IdentifiedFeatureContainer;
 import tc.oc.pgm.shield.ShieldKit;
 import tc.oc.pgm.shield.ShieldParameters;
 import tc.oc.pgm.teams.TeamFactory;
@@ -654,7 +654,7 @@ public abstract class KitParser {
           itemStack,
           factory
               .getFeatures()
-              .createReference(projectileNode, ProjectileDefinition.class)
+              .createReference(projectileNode, IdentifiedFeatureContainer.class)
               .getId());
       String name = itemStack.getItemMeta().getDisplayName();
       ItemTags.ORIGINAL_NAME.set(itemStack, name != null ? name : "");
