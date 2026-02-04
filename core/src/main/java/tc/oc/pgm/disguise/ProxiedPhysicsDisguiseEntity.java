@@ -44,7 +44,7 @@ public class ProxiedPhysicsDisguiseEntity implements DisguiseEntity {
             physics.setCustomNameVisible(true);
         }
         if (isBlockDisplay) {
-            NMS_HACKS.getEntityTypes().asBlockDisplay(model).setTransformationMatrix(
+            NMS_HACKS.getEntityTypes().asBlockDisplay(model).setTranslation(
                 -0.5f, 0.0f, -0.5f
             );
         }

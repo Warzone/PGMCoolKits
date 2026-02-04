@@ -5,6 +5,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemDisplay;
 import tc.oc.pgm.util.entity.BlockDisplayWrapper;
 import tc.oc.pgm.util.entity.EntityTypes;
+import tc.oc.pgm.util.entity.EntityWrapper;
 import tc.oc.pgm.util.entity.ItemDisplayWrapper;
 
 public class ModernEntityTypes implements EntityTypes {
@@ -29,5 +30,10 @@ public class ModernEntityTypes implements EntityTypes {
     @Override
     public ItemDisplayWrapper asItemDisplay(Entity entity) {
         return new ModernItemDisplay((ItemDisplay) entity);
+    }
+
+    @Override
+    public EntityWrapper asModernEntity(Entity entity) {
+        return new ModernEntityWrapper(entity);
     }
 }

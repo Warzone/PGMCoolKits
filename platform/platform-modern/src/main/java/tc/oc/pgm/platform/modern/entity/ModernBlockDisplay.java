@@ -6,7 +6,9 @@ import org.bukkit.entity.BlockDisplay;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import tc.oc.pgm.platform.modern.material.ModernBlockMaterialData;
 import tc.oc.pgm.util.entity.BlockDisplayWrapper;
+import tc.oc.pgm.util.material.BlockMaterialData;
 
 public class ModernBlockDisplay implements BlockDisplayWrapper {
     private final BlockDisplay blockDisplay;
@@ -21,12 +23,17 @@ public class ModernBlockDisplay implements BlockDisplayWrapper {
     }
 
     @Override
+    public void setBlock(BlockMaterialData blockMaterialData) {
+        blockDisplay.setBlock(((ModernBlockMaterialData) blockMaterialData).getBlock());
+    }
+
+    @Override
     public void setTeleportationDuration(int duration) {
         blockDisplay.setTeleportDuration(duration);
     }
 
     @Override
-    public void setTransformationMatrix(float x, float y, float z) {
+    public void setTranslation(float x, float y, float z) {
         final Matrix4f translation =
             new Matrix4f().translate(new Vector3f(x, y, z));
         final Matrix4f transformationMatrix = translation;

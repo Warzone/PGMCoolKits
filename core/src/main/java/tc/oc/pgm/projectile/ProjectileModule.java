@@ -19,12 +19,15 @@ import tc.oc.pgm.filters.FilterModule;
 import tc.oc.pgm.filters.parse.FilterParser;
 import tc.oc.pgm.kits.KitParser;
 import tc.oc.pgm.projectile.definition.BaseProjectileDefinition;
+import tc.oc.pgm.projectile.definition.BlockDisplayProjectileDefinition;
 import tc.oc.pgm.projectile.definition.IdentifiedFeatureContainer;
+import tc.oc.pgm.projectile.definition.ItemDisplayProjectileDefinition;
 import tc.oc.pgm.projectile.definition.ProjectileDefinition;
 import tc.oc.pgm.projectile.definition.RealEntityProjectileDefinition;
 import tc.oc.pgm.util.material.BlockMaterialData;
 import tc.oc.pgm.util.xml.InvalidXMLException;
 import tc.oc.pgm.util.xml.Node;
+import tc.oc.pgm.util.xml.XMLFluentParser;
 import tc.oc.pgm.util.xml.XMLUtils;
 
 import java.time.Duration;
@@ -91,15 +94,12 @@ public class ProjectileModule implements MapModule<ProjectileMatchModule> {
             final String normalizedEntity = entityText.toLowerCase(Locale.ROOT);
             return switch (normalizedEntity) {
                 case "block", "item" -> {
-                    var size = parser.parseFloat(projectileElement, "size").optional(1.0f);
-                    var solidBlockCollision = parser.parseBool(
-                        projectileElement, "solid-block-collision"
-                    ).orTrue();
-                    var duration = parser.duration(projectileElement, "max-travel-time")
-                        .optional(Duration.ofSeconds(1));
-                    var launchOptions = new SimulatedProjectileLauncher.Options(solidBlockCollision, duration, size);
-                    // TODO!
-                    yield null;
+                    var launchOptions = parseLauncherOptions(projectileElement, parser);
+                    if ("block".equals(normalizedEntity)) {
+                        yield parseBlockProjectileDefinition(projectileElement, base, launchOptions, parser);
+                    } else {
+                        yield parseItemProjectileDefinition(projectileElement, base, launchOptions, parser);
+                    }
                 }
                 default -> {
                     var entityType = XMLUtils.parseEntityTypeAttribute(projectileElement, attributeName, def);
@@ -152,6 +152,37 @@ public class ProjectileModule implements MapModule<ProjectileMatchModule> {
                 potionKit, coolDown, throwable, onHitBlockAction, onHitPlayerAction
             );
         }
-    }
 
+        private static ItemDisplayProjectileDefinition parseItemProjectileDefinition(
+            Element projectileElement,
+            BaseProjectileDefinition base, SimulatedProjectileLauncher.Options launcherOptions,
+            XMLFluentParser parser
+        ) throws InvalidXMLException {
+            var item = parser.item(projectileElement, "item").required();
+            return new ItemDisplayProjectileDefinition(item, base, launcherOptions);
+        }
+
+        private static BlockDisplayProjectileDefinition parseBlockProjectileDefinition(
+            Element projectileElement,
+            BaseProjectileDefinition base, SimulatedProjectileLauncher.Options launcherOptions,
+            XMLFluentParser parser
+        ) throws InvalidXMLException {
+            final BlockMaterialData blockMaterial = XMLUtils.parseBlockMaterialData(
+                Node.fromRequiredAttr(projectileElement, "material")
+            );
+            return new BlockDisplayProjectileDefinition(blockMaterial, base, launcherOptions);
+        }
+
+        private static SimulatedProjectileLauncher.Options parseLauncherOptions(
+            Element projectileElement, XMLFluentParser parser
+        ) throws InvalidXMLException {
+            var size = parser.parseFloat(projectileElement, "size").optional(1.0f);
+            var solidBlockCollision = parser.parseBool(
+                projectileElement, "solid-block-collision"
+            ).orTrue();
+            var duration = parser.duration(projectileElement, "max-travel-time")
+                .optional(Duration.ofSeconds(1));
+            return new SimulatedProjectileLauncher.Options(solidBlockCollision, duration, size);
+        }
+    }
 }

@@ -15,4 +15,9 @@ public class ModernItemDisplay implements ItemDisplayWrapper {
     public void setItem(ItemStack item) {
         itemDisplay.setItemStack(item);
     }
+
+    @Override
+    public void setTeleportationDuration(int duration) {
+        itemDisplay.setTeleportDuration(duration);
+    }
 }

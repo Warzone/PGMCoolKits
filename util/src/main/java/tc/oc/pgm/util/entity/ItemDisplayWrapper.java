@@ -4,4 +4,5 @@ import org.bukkit.inventory.ItemStack;
 
 public interface ItemDisplayWrapper {
     void setItem(ItemStack item);
+    void setTeleportationDuration(int duration);
 }

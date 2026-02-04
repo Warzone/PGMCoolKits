@@ -23,4 +23,8 @@ public interface EntityTypes {
     default ItemDisplayWrapper asItemDisplay(Entity entity) {
         return null;
     }
+
+    default EntityWrapper asModernEntity(Entity entity) {
+        return null;
+    }
 }

@@ -21,6 +21,7 @@ public record ItemDisplayProjectileDefinition(
         if (ITEM_DISPLAY_ENTITY_TYPE == null) return;
         var itemDisplay = location.getWorld().spawn(location, ITEM_DISPLAY_ENTITY_TYPE);
         NMS_HACKS.getEntityTypes().asItemDisplay(itemDisplay).setItem(item);
+        NMS_HACKS.getEntityTypes().asItemDisplay(itemDisplay).setTeleportationDuration(1);
         new SimulatedProjectileLauncher(
             this, source.getMatch().getExecutor(MatchScope.RUNNING), launchOptions
         ).launch(itemDisplay, source, location);
