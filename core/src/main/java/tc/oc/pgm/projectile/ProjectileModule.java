@@ -24,6 +24,7 @@ import tc.oc.pgm.projectile.definition.IdentifiedFeatureContainer;
 import tc.oc.pgm.projectile.definition.ItemDisplayProjectileDefinition;
 import tc.oc.pgm.projectile.definition.ProjectileDefinition;
 import tc.oc.pgm.projectile.definition.RealEntityProjectileDefinition;
+import tc.oc.pgm.util.entity.ItemDisplayWrapper;
 import tc.oc.pgm.util.material.BlockMaterialData;
 import tc.oc.pgm.util.xml.InvalidXMLException;
 import tc.oc.pgm.util.xml.Node;
@@ -159,7 +160,10 @@ public class ProjectileModule implements MapModule<ProjectileMatchModule> {
             XMLFluentParser parser
         ) throws InvalidXMLException {
             var item = parser.item(projectileElement, "item").required();
-            return new ItemDisplayProjectileDefinition(item, base, launcherOptions);
+            var displayContext = parser.parseEnum(
+                ItemDisplayWrapper.DisplayContext.class, projectileElement, "context"
+            ).optional(ItemDisplayWrapper.DisplayContext.NONE);
+            return new ItemDisplayProjectileDefinition(item, base, launcherOptions, displayContext);
         }
 
         private static BlockDisplayProjectileDefinition parseBlockProjectileDefinition(

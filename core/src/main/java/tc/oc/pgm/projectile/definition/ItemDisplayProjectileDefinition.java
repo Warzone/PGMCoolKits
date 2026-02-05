@@ -6,12 +6,14 @@ import org.bukkit.inventory.ItemStack;
 import tc.oc.pgm.api.match.MatchScope;
 import tc.oc.pgm.api.player.MatchPlayer;
 import tc.oc.pgm.projectile.SimulatedProjectileLauncher;
+import tc.oc.pgm.util.entity.ItemDisplayWrapper;
 
 import static tc.oc.pgm.util.nms.NMSHacks.NMS_HACKS;
 
 public record ItemDisplayProjectileDefinition(
     ItemStack item, BaseProjectileDefinition base,
-    SimulatedProjectileLauncher.Options launchOptions
+    SimulatedProjectileLauncher.Options launchOptions,
+    ItemDisplayWrapper.DisplayContext displayContext
 ) implements ProjectileDefinition {
     private static final Class<? extends Entity> ITEM_DISPLAY_ENTITY_TYPE =
         NMS_HACKS.getEntityTypes().getItemDisplayEntityType();
@@ -22,6 +24,7 @@ public record ItemDisplayProjectileDefinition(
         var itemDisplay = location.getWorld().spawn(location, ITEM_DISPLAY_ENTITY_TYPE);
         NMS_HACKS.getEntityTypes().asItemDisplay(itemDisplay).setItem(item);
         NMS_HACKS.getEntityTypes().asItemDisplay(itemDisplay).setTeleportationDuration(1);
+        NMS_HACKS.getEntityTypes().asItemDisplay(itemDisplay).setDisplayContext(displayContext);
         new SimulatedProjectileLauncher(
             this, source.getMatch().getExecutor(MatchScope.RUNNING), launchOptions
         ).launch(itemDisplay, source, location);

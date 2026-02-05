@@ -2,6 +2,9 @@ package tc.oc.pgm.util.xml;
 
 import com.google.common.collect.Range;
 import java.time.Duration;
+import java.util.List;
+import java.util.function.Function;
+
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
@@ -70,6 +73,17 @@ public class XMLFluentParser {
       @Override
       protected T parse(String text) throws TextException {
         return TextParser.parseEnum(text, type);
+      }
+    };
+  }
+
+  public <T extends Enum<T>> PrimitiveBuilder.Generic<T> inline(
+      Element el, List<String> prop, Function<String, T> parser
+  ) {
+    return new PrimitiveBuilder.Generic<T>(el, prop.toArray(prop.toArray(new String[0]))) {
+      @Override
+      protected T parse(String text) throws TextException {
+        return parser.apply(text);
       }
     };
   }
