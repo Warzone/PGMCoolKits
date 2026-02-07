@@ -51,6 +51,7 @@ import tc.oc.pgm.util.chunk.NullChunkGenerator;
 import tc.oc.pgm.util.entity.BlockDisplayWrapper;
 import tc.oc.pgm.util.entity.EntityTypes;
 import tc.oc.pgm.util.entity.EntityWrapper;
+import tc.oc.pgm.util.entity.PlatformEntityAttributes;
 import tc.oc.pgm.util.material.BlockMaterialData;
 import tc.oc.pgm.util.nms.NMSHacks;
 import tc.oc.pgm.util.platform.Supports;
@@ -384,5 +385,10 @@ public class SpNMSHacks implements NMSHacks {
   @Override
   public EntityWrapper getEntityWrapper(Entity entity) {
     throw new RuntimeException("getEntityWrapper is not supported in this version");
+  }
+
+  @Override
+  public PlatformEntityAttributes getPlatformEntityAttributes() {
+    throw new RuntimeException("getPlatformEntityAttributes is not supported in this version");
   }
 }

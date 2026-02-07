@@ -24,6 +24,7 @@ import org.bukkit.util.Vector;
 import tc.oc.pgm.util.entity.BlockDisplayWrapper;
 import tc.oc.pgm.util.entity.EntityTypes;
 import tc.oc.pgm.util.entity.EntityWrapper;
+import tc.oc.pgm.util.entity.PlatformEntityAttributes;
 import tc.oc.pgm.util.material.BlockMaterialData;
 import tc.oc.pgm.util.platform.Platform;
 import tc.oc.pgm.util.skin.Skin;
@@ -100,4 +101,6 @@ public interface NMSHacks {
   BlockDisplayWrapper asBlockDisplay(Entity entity);
 
   EntityWrapper getEntityWrapper(Entity entity);
+
+  PlatformEntityAttributes getPlatformEntityAttributes();
 }

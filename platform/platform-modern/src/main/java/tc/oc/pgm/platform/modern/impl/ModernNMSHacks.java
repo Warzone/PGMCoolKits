@@ -104,6 +104,7 @@ import tc.oc.pgm.util.chunk.NullChunkGenerator;
 import tc.oc.pgm.util.entity.BlockDisplayWrapper;
 import tc.oc.pgm.util.entity.EntityTypes;
 import tc.oc.pgm.util.entity.EntityWrapper;
+import tc.oc.pgm.util.entity.PlatformEntityAttributes;
 import tc.oc.pgm.util.material.BlockMaterialData;
 import tc.oc.pgm.util.nms.NMSHacks;
 import tc.oc.pgm.util.platform.Supports;
@@ -583,6 +584,7 @@ public class ModernNMSHacks implements NMSHacks {
 
     @Override
     public double getEntityHeight(Entity entity) {
+        if (entity instanceof org.bukkit.entity.LivingEntity bob) return entity.getHeight() * bob.getAttribute(Attribute.SCALE).getBaseValue();
         return entity.getHeight();
     }
 
@@ -619,5 +621,10 @@ public class ModernNMSHacks implements NMSHacks {
     @Override
     public EntityWrapper getEntityWrapper(Entity entity) {
         return new ModernEntityWrapper(entity);
+    }
+
+    @Override
+    public PlatformEntityAttributes getPlatformEntityAttributes() {
+        return ModernEntityAttributes.INSTANCE;
     }
 }

@@ -4,8 +4,9 @@ import org.bukkit.entity.Entity;
 import org.jdom2.Attribute;
 import org.jdom2.Element;
 import org.jetbrains.annotations.Nullable;
+
+import tc.oc.pgm.util.entity.EntityAttributeDescription;
 import tc.oc.pgm.util.entity.EntityAttributes;
-import tc.oc.pgm.util.entity.EntityAttributes.EntityAttributeDescription;
 import tc.oc.pgm.util.entity.EntitySpecification;
 import tc.oc.pgm.util.entity.ProxiedPhysicsEntitySpecification;
 import tc.oc.pgm.util.entity.SimpleEntitySpecification;
@@ -51,7 +52,6 @@ public class EntityBuilder extends Builder<EntitySpecification, EntityBuilder> {
     private SimpleEntitySpecification parseSimpleEntitySpecification(
         Node node, boolean showNametag
     ) throws InvalidXMLException {
-        final Attribute typeAttribute = XMLUtils.getRequiredAttribute(node.getElement(), TYPE_KEY);
         final Class<? extends Entity> entityClass = parseEntity(node);
         final List<SimpleEntitySpecification.AttributeApplication> attributeApplications = new ArrayList<>();
         applyDefaults(entityClass, attributeApplications);
@@ -59,7 +59,7 @@ public class EntityBuilder extends Builder<EntitySpecification, EntityBuilder> {
             if (RESERVED_ATTRIBUTES.contains(attribute.getName())) {
                 continue;
             }
-            EntityAttributes.EntityAttributeDescription attributeData = EntityAttributes.INSTANCE.attributeData.get(
+            EntityAttributeDescription attributeData = EntityAttributes.INSTANCE.attributeData.get(
                 attribute.getName()
             );
             if (attributeData == null) {

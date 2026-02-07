@@ -1,10 +1,7 @@
 package tc.oc.pgm.util.entity;
 
-import org.bukkit.Material;
-import org.bukkit.entity.Creeper;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.FallingBlock;
-import tc.oc.pgm.util.material.MaterialData;
+import org.bukkit.DyeColor;
+import org.bukkit.entity.*;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,7 +21,6 @@ public class EntityAttributes {
 
     static {
         final Map<String, EntityAttributeDescription> attributeFunctions = new HashMap<>();
-        var blockDisplayClass = NMS_HACKS.getEntityTypes().getBlockDisplayEntityType();
 
         addAttributeFunction(
             attributeFunctions,
@@ -33,24 +29,7 @@ public class EntityAttributes {
             (creeper, charged) -> ((Creeper) creeper).setPowered((boolean) charged),
             false
         );
-        if (blockDisplayClass != null) {
-            addAttributeFunction(
-                attributeFunctions,
-                "block", (s) -> Material.valueOf(s.replace(" ", "_").toUpperCase()),
-                blockDisplayClass,
-                (blockDisplay, blockMaterial) ->
-                    NMS_HACKS.asBlockDisplay(blockDisplay).setBlock((Material) blockMaterial),
-                Material.STONE
-            );
-            addAttributeFunction(
-                attributeFunctions,
-                "teleportation-duration", Integer::parseInt,
-                blockDisplayClass,
-                (blockDisplay, teleportationDuration) ->
-                    NMS_HACKS.asBlockDisplay(blockDisplay).setTeleportationDuration((int) teleportationDuration),
-                null
-            );
-        }
+
         addAttributeFunction(
             attributeFunctions,
             "noGravity", Boolean::parseBoolean,
@@ -65,6 +44,85 @@ public class EntityAttributes {
             (entity, autoExpire) -> NMS_HACKS.setFallingBlockAutoExpire(entity, (boolean) autoExpire),
             true
         );
+
+        // Common Entity attributes
+
+        // Ageable
+        addAttributeFunction(
+            attributeFunctions,
+            "baby", Boolean::parseBoolean,
+            Ageable.class,
+            (entity, baby) -> { if ((boolean) baby) ((Ageable) entity).setBaby(); else ((Ageable) entity).setAdult(); },
+            false
+        );
+
+        // Slime / MagmaCube
+        addAttributeFunction(
+            attributeFunctions,
+            "slimeSize", Integer::parseInt,
+            Slime.class,
+            (entity, size) -> ((Slime) entity).setSize((int) size),
+            1
+        );
+
+        // Sheep
+        addAttributeFunction(
+            attributeFunctions,
+            "sheepColor", (s) -> DyeColor.valueOf(s.toUpperCase()),
+            Sheep.class,
+            (entity, color) -> ((Sheep) entity).setColor((DyeColor) color),
+            DyeColor.WHITE
+        );
+        addAttributeFunction(
+            attributeFunctions,
+            "sheared", Boolean::parseBoolean,
+            Sheep.class,
+            (entity, sheared) -> ((Sheep) entity).setSheared((boolean) sheared),
+            false
+        );
+
+        // Wolf
+        addAttributeFunction(
+            attributeFunctions,
+            "angry", Boolean::parseBoolean,
+            Wolf.class,
+            (entity, angry) -> ((Wolf) entity).setAngry((boolean) angry),
+            false
+        );
+        addAttributeFunction(
+            attributeFunctions,
+            "collarColor", (s) -> DyeColor.valueOf(s.toUpperCase()),
+            Wolf.class,
+            (entity, color) -> ((Wolf) entity).setCollarColor((DyeColor) color),
+            DyeColor.RED
+        );
+
+        // Rabbit
+        addAttributeFunction(
+            attributeFunctions,
+            "rabbitType", (s) -> Rabbit.Type.valueOf(s.toUpperCase()),
+            Rabbit.class,
+            (entity, type) -> ((Rabbit) entity).setRabbitType((Rabbit.Type) type),
+            Rabbit.Type.BROWN
+        );
+
+        // Horse
+        addAttributeFunction(
+            attributeFunctions,
+            "horseColor", (s) -> Horse.Color.valueOf(s.toUpperCase()),
+            Horse.class,
+            (entity, color) -> ((Horse) entity).setColor((Horse.Color) color),
+            Horse.Color.BROWN
+        );
+        addAttributeFunction(
+            attributeFunctions,
+            "horseStyle", (s) -> Horse.Style.valueOf(s.toUpperCase()),
+            Horse.class,
+            (entity, style) -> ((Horse) entity).setStyle((Horse.Style) style),
+            Horse.Style.NONE
+        );
+
+        attributeFunctions.putAll(NMS_HACKS.getPlatformEntityAttributes().getAttributeFunctions());
 
         INSTANCE = new EntityAttributes(attributeFunctions);
     }
@@ -81,11 +139,4 @@ public class EntityAttributes {
         }
         attributeFunctions.put(key, new EntityAttributeDescription(classRequired, parser, function, defaultValue));
     }
-
-    public record EntityAttributeDescription(
-        Class<? extends Entity> classRequired,
-        Function<String, Object> parser,
-        BiConsumer<Entity, Object> function,
-        Object defaultValue
-    ) { }
 }

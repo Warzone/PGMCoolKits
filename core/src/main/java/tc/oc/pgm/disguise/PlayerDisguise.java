@@ -72,13 +72,20 @@ public class PlayerDisguise implements Listener {
 
     @EventHandler
     public void onDamage(final EntityDamageByEntityEvent event) {
-        if (disguise == null) return;
-        if (!event.getEntity().equals(disguise.getPhysicsEntity())) return;
-        if (isTeammate(event.getDamager())) {
+        Entity damager = event.getDamager();
+        Entity victim = event.getEntity();
+        if (disguise == null || (damager != disguise.getPhysicsEntity() && victim != disguise.getPhysicsEntity())) return;
+
+        Entity disguiseEntity = disguise.getPhysicsEntity();
+
+        if (damager.equals(disguiseEntity) || isTeammateOrSpectator(damager)) {
             event.setCancelled(true);
             return;
         }
-        propagateDamage(event.getDamager(), event.getFinalDamage(), event);
+
+        if (!victim.equals(disguiseEntity)) return;
+
+        propagateDamage(damager, event.getFinalDamage(), event);
     }
 
     @EventHandler
@@ -106,7 +113,7 @@ public class PlayerDisguise implements Listener {
             return;
         }
         if (!hitEntity.equals(disguise.getPhysicsEntity())) return;
-        if (isTeammate(event.getEntity())) {
+        if (isTeammateOrSpectator(event.getEntity())) {
             NMS_HACKS.cancelProjectileHitEvent(event);
         }
     }
@@ -125,7 +132,7 @@ public class PlayerDisguise implements Listener {
         event.setDamage(0);
     }
 
-    private boolean isTeammate(Entity entity) {
+    private boolean isTeammateOrSpectator(Entity entity) {
         if (entity instanceof Projectile projectile && projectile.getShooter() instanceof Player) {
             entity = (Player) projectile.getShooter();
         }
@@ -136,7 +143,7 @@ public class PlayerDisguise implements Listener {
 
         MatchPlayer mpDamager = match.getPlayer(damager);
         MatchPlayer mpVictim = match.getPlayer(player);
-
+        if (!mpDamager.isParticipating()) return true;
         return (mpVictim.getParty() == mpDamager.getParty());
     }
 }
