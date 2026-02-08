@@ -1,6 +1,7 @@
 package tc.oc.pgm.util.xml.parsers;
 
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.jdom2.Attribute;
 import org.jdom2.Element;
 import org.jetbrains.annotations.Nullable;
@@ -125,12 +126,11 @@ public class EntityBuilder extends Builder<EntitySpecification, EntityBuilder> {
         return entityClass;
     }
 
-    @SuppressWarnings("unchecked")
     private Class<? extends Entity> getEntity(final String entityName) {
-        // todo: this is temporary, to be changed to lookup in entity registry
         try {
-            return (Class<? extends Entity>) Class.forName("org.bukkit.entity." + entityName);
-        } catch (final ClassNotFoundException e) {
+            String key = entityName.toUpperCase().replace(" ", "_");
+            return EntityType.valueOf(key).getEntityClass();
+        } catch (final IllegalArgumentException e) {
             return null;
         }
     }
