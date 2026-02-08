@@ -49,7 +49,10 @@ public class SimulatedProjectileLauncher {
         this.halfSize = 0.5 * options.size;
     }
 
-    public record Options(boolean solidBlockCollision, Duration maxTravelTime, double size) { }
+    public record Options(
+        boolean solidBlockCollision, Duration maxTravelTime, double size,
+        boolean align
+    ) { }
 
     public void launch(Entity entity, MatchPlayer source, Location location) {
         this.entity = entity;
@@ -59,6 +62,10 @@ public class SimulatedProjectileLauncher {
         this.increment = normalizedDirection.clone().multiply(velocity);
         this.substep = increment.clone().divide(new Vector(substeps, substeps, substeps));
         if (this.substep.length() < 0.1) this.substep = normalizedDirection.clone().multiply(0.1);
+        if (options.align) { // alignment gets handled by the transformation, should not have any orientation
+            this.currentLocation.setYaw(0);
+            this.currentLocation.setPitch(0);
+        }
         task = scheduledExecutorService.scheduleAtFixedRate(this::tick, 0L, 50L, TimeUnit.MILLISECONDS);
     }
 

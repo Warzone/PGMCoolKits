@@ -21,10 +21,16 @@ public record ItemDisplayProjectileDefinition(
     @Override
     public void launch(MatchPlayer source, Location location) {
         if (ITEM_DISPLAY_ENTITY_TYPE == null) return;
-        var itemDisplay = location.getWorld().spawn(location, ITEM_DISPLAY_ENTITY_TYPE);
+        var corrected = location.clone();
+        corrected.setYaw(0);
+        corrected.setPitch(0);
+        var itemDisplay = location.getWorld().spawn(corrected, ITEM_DISPLAY_ENTITY_TYPE);
         NMS_HACKS.getEntityTypes().asItemDisplay(itemDisplay).setItem(item);
         NMS_HACKS.getEntityTypes().asItemDisplay(itemDisplay).setTeleportationDuration(1);
         NMS_HACKS.getEntityTypes().asItemDisplay(itemDisplay).setDisplayContext(displayContext);
+        if (launchOptions.align()) {
+            NMS_HACKS.getEntityTypes().asItemDisplay(itemDisplay).alignToFacing(location.getYaw(), location.getPitch());
+        }
         new SimulatedProjectileLauncher(
             this, source.getMatch().getExecutor(MatchScope.RUNNING), launchOptions
         ).launch(itemDisplay, source, location);

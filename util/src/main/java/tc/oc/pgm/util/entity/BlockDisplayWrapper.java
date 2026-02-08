@@ -8,4 +8,5 @@ public interface BlockDisplayWrapper {
     void setBlock(BlockMaterialData blockMaterialData);
     void setTeleportationDuration(int duration);
     void setTranslation(float x, float y, float z);
+    void alignToFacing(float pitch, float yaw, float size);
 }

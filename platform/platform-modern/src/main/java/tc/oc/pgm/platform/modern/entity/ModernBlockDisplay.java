@@ -39,4 +39,20 @@ public class ModernBlockDisplay implements BlockDisplayWrapper {
         final Matrix4f transformationMatrix = translation;
         blockDisplay.setTransformationMatrix(transformationMatrix);
     }
+
+    @Override
+    public void alignToFacing(float pitch, float yaw, float size) {
+        final Matrix4f translation =
+            new Matrix4f().translate(new Vector3f(-0.5f * size, -0.5f * size, -0.5f * size));
+
+        final Matrix4f rotationMatrix = new Matrix4f();
+        final Quaternionf rotation = new Quaternionf();
+        rotation.rotateLocalX((float) Math.toRadians(-pitch));
+        rotation.rotateLocalY((float) Math.toRadians(180 - yaw));
+        rotation.get(rotationMatrix);
+
+        final Matrix4f scaleMatrix = new Matrix4f().scale(size);
+        final Matrix4f transformationMatrix = rotationMatrix.mul(translation.mul(scaleMatrix));
+        blockDisplay.setTransformationMatrix(transformationMatrix);
+    }
 }

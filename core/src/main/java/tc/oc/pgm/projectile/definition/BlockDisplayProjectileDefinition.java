@@ -19,9 +19,15 @@ public record BlockDisplayProjectileDefinition(
     @Override
     public void launch(MatchPlayer source, Location location) {
         if (BLOCK_DISPLAY_ENTITY_TYPE == null) return;
+        var corrected = location.clone();
+        corrected.setYaw(0);
+        corrected.setPitch(0);
         var blockDisplay = location.getWorld().spawn(location, BLOCK_DISPLAY_ENTITY_TYPE);
         NMS_HACKS.getEntityTypes().asBlockDisplay(blockDisplay).setBlock(materialData);
         NMS_HACKS.getEntityTypes().asBlockDisplay(blockDisplay).setTeleportationDuration(1);
+        NMS_HACKS.getEntityTypes().asBlockDisplay(blockDisplay).alignToFacing(
+            location.getPitch(), location.getYaw(), (float) launchOptions.size()
+        );
         new SimulatedProjectileLauncher(
             this, source.getMatch().getExecutor(MatchScope.RUNNING), launchOptions
         ).launch(blockDisplay, source, location);

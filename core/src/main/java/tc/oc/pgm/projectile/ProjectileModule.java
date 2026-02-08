@@ -186,7 +186,10 @@ public class ProjectileModule implements MapModule<ProjectileMatchModule> {
             ).orTrue();
             var duration = parser.duration(projectileElement, "max-travel-time")
                 .optional(Duration.ofSeconds(1));
-            return new SimulatedProjectileLauncher.Options(solidBlockCollision, duration, size);
+            var align = parser.parseBool(
+                projectileElement, "align"
+            ).optional(true);
+            return new SimulatedProjectileLauncher.Options(solidBlockCollision, duration, size, align);
         }
     }
 }
